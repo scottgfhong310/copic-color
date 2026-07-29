@@ -1,0 +1,15 @@
+{
+  "name": "copic-color",
+  "version": "1.0.0",
+  "description": "COPIC 色號 → CSS 對照的唯讀參考 WebApp：358 色依 Copic Color System 三軸瀏覽（色系 × Blending Group × Intensity）、62 組套組收錄對照、一鍵複製、.css 匯出，支援 light/dark 與三語。",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": ["copic", "marker", "color", "colour", "css", "palette", "reference", "express", "materialize"],
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2",
+    "morgan": "^1.10.0"
+  }
+}

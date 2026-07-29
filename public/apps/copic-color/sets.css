@@ -1,0 +1,42 @@
+/* sets — 套組收錄對照（第二頁）。主題 token 與共用元件沿用 copic-color.css。 */
+
+.app-container.wide { max-width: 1600px; }
+
+.set-picker { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pick-label { font-size: .78rem; color: var(--muted); }
+.set-picker select {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); padding: 7px 10px; font-size: .86rem; max-width: 320px;
+}
+.legend { font-size: .74rem; color: var(--muted); margin: 2px 0 14px; }
+
+.matrix-wrap { overflow: auto; max-height: 74vh; }   /* 表自己捲，頁面不橫捲 */
+
+table.matrix { border-collapse: separate; border-spacing: 0; font-size: .78rem; }
+table.matrix th, table.matrix td { padding: 4px 6px; white-space: nowrap; }
+
+/* 左兩欄（色票 / 色號）與表頭都要黏住，否則橫捲時對不上是哪個色 */
+table.matrix thead th { position: sticky; top: 0; z-index: 3; background: var(--bg); }
+table.matrix thead th.c-swatch, table.matrix thead th.c-code { z-index: 5; }
+table.matrix th.c-swatch, table.matrix td.c-swatch { position: sticky; left: 0; background: var(--bg); z-index: 2; }
+table.matrix th.c-code,   table.matrix td.c-code   { position: sticky; left: 42px; background: var(--bg); z-index: 2; }
+
+.m-sw { width: 26px; height: 20px; border-radius: 4px; border: 1px solid rgba(0,0,0,.15); cursor: pointer; }
+.m-code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; cursor: pointer; }
+.m-code:hover { color: var(--accent); }
+
+.set-col { writing-mode: vertical-rl; text-orientation: mixed; font-weight: 500; color: var(--muted);
+           max-height: 190px; overflow: hidden; text-overflow: ellipsis; font-size: .72rem; }
+.set-col.is-base { color: var(--accent); font-weight: 700; }
+
+.gap-row th, .gap-row td { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.gap-cell { text-align: center; font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.gap-0 { color: #34c38f; }
+.gap-n { color: var(--muted); }
+.gap-label { font-size: .72rem; color: var(--muted); text-align: right; }
+
+.hit { text-align: center; color: var(--accent); font-weight: 700; }
+.miss { text-align: center; color: var(--border); }
+
+tbody tr:hover td { background: var(--surface-2); }
+tbody tr:hover td.c-swatch, tbody tr:hover td.c-code { background: var(--surface-2); }
