@@ -13,6 +13,7 @@ COPIC 色號 → CSS（hex / `var(--copic-…)` / `rgb()` / `.copic-bg-…`）�
 ```
 app.js                                # Express 入口：port 3000；/ → 302 /apps/copic-color/
                                       # 唯讀，無 API、無上傳；**不連任何資料庫**
+scripts/sync-copies.sh                # 前端 → InProgress 鏡像，逐檔比對＋共用件 hash
 public/apps/copic-color/
 ├─ index.html · copic-color.css · copic-color.js · copic-color-lib.js   # 主頁：三軸瀏覽
 ├─ sets.html · sets.css · sets.js     # 第二頁：套組收錄對照
@@ -77,5 +78,18 @@ CSS 匯出/下載、i18n 三語、主題切換（**色票保留真實顏色、�
 | `filter-clear.css`、`filter-clear.js` | 家族 §5.12 篩選框「清除」× 鈕 utility |
 | `i18n.js` | 家族 repo `nodeapp-webapp-family/i18n.js`（權威版，byte-identical） |
 | `data/copic-*.js` | **由 `db_artcolor` 匯出**（`My Projects/Art Colour/export/a3-export.js`）。<br>`--check` 逐位元組比對、不一致回非 0。**不要手改這兩個檔** |
+
+## 回灌 InProgress（Path A 的 A4）
+
+```bash
+bash scripts/sync-copies.sh           # 整包前端 → InProgress/public/apps/copic-color/
+```
+
+- **只搬前端**：本 app 無 `routes/`、無 API，故 InProgress 端**不必掛任何 route**，
+  也不必動它的 `app.js`／`upload.js`。無 `public/upload/`，沒有資料保存資料夾要顧。
+- **不必重啟 3001 的常駐 server**：純靜態檔，`express.static` 每次請求都讀磁碟。
+  （有動到 route 的 app 才需要重啟——本 app 沒有。2026-07-29 實測：未重啟即可服務。）
+- **回灌不是一次性的**：GitHub 版是權威，之後每次改前端都要再跑一次同步腳本，
+  否則 3001 上跑的是舊版。
 
 > 為什麼長這樣（三軸決策、資料來源與抽取、兩層模型在本 app 的落點）見 [DESIGN.md](DESIGN.md)。
