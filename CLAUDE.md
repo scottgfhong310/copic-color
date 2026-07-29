@@ -14,6 +14,7 @@ COPIC 色號 → CSS（hex / `var(--copic-…)` / `rgb()` / `.copic-bg-…`）�
 app.js                                # Express 入口：port 3000；/ → 302 /apps/copic-color/
                                       # 唯讀，無 API、無上傳；**不連任何資料庫**
 scripts/sync-copies.sh                # 前端 → InProgress 鏡像，逐檔比對＋共用件 hash
+scripts/make-icons.py                 # 由母版重出整套 icon；九格 hex 由 data/ 現查、不寫死
 public/apps/copic-color/
 ├─ index.html · copic-color.css · copic-color.js · copic-color-lib.js   # 主頁：三軸瀏覽
 ├─ sets.html · sets.css · sets.js     # 第二頁：套組收錄對照
@@ -33,6 +34,7 @@ public/apps/copic-color/
 
 ```bash
 npm install && node app.js            # → http://localhost:3000/apps/copic-color/
+python3 scripts/make-icons.py         # 重產整套 App icon（改母版參數後跑）
 ```
 
 驗證（preview 實跑）：`/` 302、資產 200、`copic-*.js` 200、API 404 回 JSON、
@@ -59,7 +61,7 @@ CSS 匯出/下載、i18n 三語、主題切換（**色票保留真實顏色、�
 - **hex 是螢幕近似值**：型錄**自己聲明**印刷色與實際墨水不同。耐光度與顏料欄一律空
   （酒精染料非顏料，原廠不公布）。
 
-## 三個踩過的坑（動 CSS 或 icon 前先看）
+## 四個踩過的坑（動 CSS 或 icon 前先看）
 
 - **Materialize 會蓋掉色塊上的字色**：`materialize-dark.css` 有一條 `span` 的顏色規則，
   把 `pickTextColor` 算出、寫在父元素 inline style 的字色蓋掉（實測 span 算出 `#eee`，
@@ -71,6 +73,10 @@ CSS 匯出/下載、i18n 三語、主題切換（**色票保留真實顏色、�
   **2026-07-29 已改在權威共用件解決**——該規則改為 `background: var(--bg, var(--mz-bg))`，
   app 有宣告 `--bg` 就採用它。本 app 因此**不需要**在自己的 CSS 裡繞過。
   同一顆也曾讓 `faber-castell-color`／`caran-dache-color`／`color-palette` 的 sticky 標頭出現接縫。
+- **icon 產生器一度沒進版控**（2026-07-29 補回）：它原本寫在暫存區，跑完就沒了，
+  那 15 個 icon 因此有一段時間**在 repo 內無法重新產生**。`faber-castell-color` 的
+  `sync-copies.sh` 踩過同一個洞。**產生產物的腳本必須跟產物住在一起。**
+  補回時以既有產物為驗收標準：重跑後 15 檔逐位元組相同（見 DESIGN.md §8.2）。
 - **PyMuPDF 光柵化 SVG 有兩個限制**（重產 icon 時會撞到）：① **不渲染 `linearGradient`**，
   會整片退成黑色——故母版一律純色底；② **以 SVG 宣告的 `width`/`height` 為基準、不是 `viewBox`**，
   倍率要用「目標 ÷ 實際 page 寬」反推。詳見 DESIGN.md §8.1。
