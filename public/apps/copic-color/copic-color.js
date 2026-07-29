@@ -261,7 +261,7 @@
       M.toast({ html: I18n.t('toast.lang', { name: I18n.name(next) }), displayLength: 1400 });
     });
     // i18n 引擎切語言後自己 apply DOM，但動態產生的節點要重畫（§4：控制器負責重繪）
-    document.addEventListener('i18n:changed', render);
+    document.addEventListener('i18n:changed', function () { render(); CopicDetail.refresh(); });
 
     var cssModal = M.Modal.init(document.getElementById('css-modal'), { preventScrolling: false });
     document.getElementById('setting-css').addEventListener('click', function () {

@@ -32,9 +32,12 @@ I18n.register('ja', {
   'detail.close': '閉じる',
   'detail.lines': '製品ライン',
   'detail.sets': '収録セット',
+  'detail.parse': 'カラーナンバーの構成',
+  'detail.family': 'カラーファミリー',
   'detail.bg': 'ブレンディンググループ',
   'detail.iv': 'インテンシティ',
   'detail.noSet': '収録セットなし',
+  'note.approx': 'hex は公式カタログから採取した画面上の近似値です。カタログ自身が印刷色と実際のインクは異なると明記しています',
 
   'sets.title': 'COPIC セット収録対照',
   'sets.sub': 'セットを一つ選ぶ → その色だけ残す → 横に見て他のセットの網羅状況を確認',
@@ -47,6 +50,7 @@ I18n.register('ja', {
   'sets.allLines': '全 62 セットと比較',
 
   'toast.copied': 'コピーしました',
+  'toast.copyFail': 'コピーに失敗しました（localhost または HTTPS が必要）',
   'toast.lang': '言語：{name}',
   'toast.downloaded': '{n} をダウンロードしました'
 }, '日本語');

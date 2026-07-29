@@ -122,7 +122,7 @@ main { min-height: 100vh; }
  * 於是淺色格變成白字白底、整格看不見）。這裡強制繼承父層。
  * FC / CDA 沒踩到是因為它們把文字直接放在元素上，沒有子 span。 */
 .cp-cell .c-code, .cp-cell .c-lines,
-.cp-swatch span, .d-swatch span, .near-sw span { color: inherit; }
+.cp-swatch span, .detail-head span, .near-sw span { color: inherit; }
 
 /* ===== 一維色票列（搜尋結果 / 非彩色系） ===== */
 .flat-list {
@@ -187,37 +187,51 @@ main { min-height: 100vh; }
   .cell-empty, .cp-cell { width: 60px; height: 40px; }
 }
 
-/* ===== 色票明細 Modal（colour-detail.js 注入的 markup） ===== */
-.detail-modal .modal-content { background: var(--surface); color: var(--text); }
+/* ===== 色票明細 Modal（colour-detail.js 注入的 markup） =====
+ * 形制與 faber-castell-color／caran-dache-color 的明細逐條對齊：同一組 class、同一份數值
+ * （色帶頭 → 色名／註記 → 複製鈕列 → 若干 .d-section）。三支色彩 registry 打開明細
+ * 看到的是同一張卡，只有段落內容不同。改這一段前先確認另兩支要不要一起動。 */
+.detail-modal { border-radius: 14px; max-width: 560px; }
+.detail-modal .modal-content { padding: 0; background: var(--surface); color: var(--text); }
 .detail-modal .modal-footer { background: var(--surface); }
-.d-head { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
-.d-swatch {
-  width: 96px; height: 72px; border-radius: 10px; flex: none;
-  display: flex; align-items: flex-end; padding: 7px 9px;
-  font-size: .84rem; font-weight: 700; border: 1px solid rgba(0,0,0,.12);
+.detail-head {
+  height: 120px; display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 14px 18px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-.d-code { font-size: 1.34rem; font-weight: 700; letter-spacing: .01em; }
-.d-name { font-size: .94rem; color: var(--text); }
-.d-parse { font-size: .8rem; color: var(--muted); margin-top: 4px; }
-.d-parse b { color: var(--accent); font-weight: 600; }
-.d-parse .sep { margin: 0 7px; opacity: .5; }
+.detail-head .d-code { font-size: 1.3rem; font-weight: 600; }
+.detail-head .d-tag { font-size: .82rem; opacity: .92; text-align: right; }
+.detail-body { padding: 16px 20px 6px; }
+.detail-body .d-name { font-size: 1.05rem; font-weight: 500; color: var(--text); }
+.detail-body .d-note { font-size: .74rem; color: var(--muted); margin: 6px 0 12px; }
 
-.d-copy { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-.d-copy-btn {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
-  background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
-  padding: 6px 10px; cursor: pointer; color: var(--text); font: inherit; text-align: left;
+/* 複製鈕列 */
+.copy-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.copy-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--border); border-radius: 9px;
+  background: var(--surface); color: var(--text);
+  padding: 7px 11px; font-size: .82rem; cursor: pointer;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  transition: border-color .15s, background .15s, color .15s;
 }
-.d-copy-btn:hover { border-color: var(--accent); }
-.d-copy-btn .k { font-size: .66rem; color: var(--muted); letter-spacing: .05em; }
-.d-copy-btn .v { font-size: .8rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.copy-btn:hover { border-color: var(--accent); }
+.copy-btn.copied { border-color: #37b26b; color: #37b26b; }
+.copy-btn .material-icons { font-size: 16px; }
 
-.d-block { margin-bottom: 14px; }
-.d-label { font-size: .72rem; color: var(--muted); letter-spacing: .05em; margin-bottom: 6px; }
-.d-sets { display: flex; flex-wrap: wrap; gap: 6px; }
-.set-pill {
-  background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px;
-  padding: 4px 11px; font-size: .78rem; color: var(--text); cursor: pointer; font: inherit;
+/* 明細裡的區塊（色號分解 / 產品線 / 套組） */
+.d-section { margin: 12px 0; }
+.d-section h6 { font-size: .82rem; color: var(--muted); font-weight: 500; margin: 0 0 8px; text-transform: none; }
+.facts-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.facts-table td { padding: 5px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.facts-table td.fk { color: var(--muted); white-space: nowrap; width: 34%; }
+.facts-table td.fv { color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.set-line { font-size: .82rem; margin: 3px 0; color: var(--text); }
+.set-line .line-name { color: var(--muted); }
+.set-line .set-link {
+  background: none; border: 0; padding: 0 1px; cursor: pointer;
+  font: inherit; color: var(--accent); text-decoration: underline;
+  text-decoration-color: var(--border); text-underline-offset: 2px;
 }
-.set-pill:hover { border-color: var(--accent); color: var(--accent); }
-.d-none { font-size: .8rem; color: var(--muted); }
+.set-line .set-link:hover { text-decoration-color: var(--accent); }
+.d-empty { font-size: .8rem; color: var(--muted); }

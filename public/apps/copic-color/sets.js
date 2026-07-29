@@ -182,7 +182,7 @@
       var next = I18n.cycle();
       M.toast({ html: I18n.t('toast.lang', { name: I18n.name(next) }), displayLength: 1400 });
     });
-    document.addEventListener('i18n:changed', function () { fillPickers(); render(); });
+    document.addEventListener('i18n:changed', function () { fillPickers(); render(); CopicDetail.refresh(); });
   }
 
   document.addEventListener('DOMContentLoaded', function () {

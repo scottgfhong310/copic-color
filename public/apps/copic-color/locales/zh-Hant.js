@@ -32,9 +32,12 @@ I18n.register('zh-Hant', {
   'detail.close': '關閉',
   'detail.lines': '產品線',
   'detail.sets': '收錄於套組',
+  'detail.parse': '色號分解',
+  'detail.family': '色系',
   'detail.bg': 'Blending Group',
   'detail.iv': 'Intensity',
   'detail.noSet': '不在任何已收錄的套組裡',
+  'note.approx': 'hex 取自官方型錄、為螢幕近似值；型錄自述印刷色與實際墨水不同',
 
   'sets.title': 'COPIC 套組收錄對照',
   'sets.sub': '選一個套組 → 只留下它收錄的色 → 橫向看其他套組有沒有涵蓋',
@@ -47,6 +50,7 @@ I18n.register('zh-Hant', {
   'sets.allLines': '比全部 62 組',
 
   'toast.copied': '已複製',
+  'toast.copyFail': '複製失敗（需 localhost 或 HTTPS）',
   'toast.lang': '語言：{name}',
   'toast.downloaded': '已下載 {n}'
 }, '繁體中文');

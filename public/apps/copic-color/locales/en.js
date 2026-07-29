@@ -32,9 +32,12 @@ I18n.register('en', {
   'detail.close': 'Close',
   'detail.lines': 'Product lines',
   'detail.sets': 'Included in sets',
+  'detail.parse': 'Code breakdown',
+  'detail.family': 'Colour family',
   'detail.bg': 'Blending Group',
   'detail.iv': 'Intensity',
   'detail.noSet': 'Not in any recorded set',
+  'note.approx': 'Hex is sampled from the official catalogue and is a screen approximation; the catalogue itself states printed colours differ from the actual ink',
 
   'sets.title': 'COPIC assortment coverage',
   'sets.sub': 'Pick a set → keep only its colours → scan across to see which other sets cover them',
@@ -47,6 +50,7 @@ I18n.register('en', {
   'sets.allLines': 'Compare all 62 sets',
 
   'toast.copied': 'Copied',
+  'toast.copyFail': 'Copy failed (needs localhost or HTTPS)',
   'toast.lang': 'Language: {name}',
   'toast.downloaded': 'Downloaded {n}'
 }, 'English');

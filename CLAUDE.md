@@ -58,6 +58,12 @@ CSS 匯出/下載、i18n 三語、主題切換（**色票保留真實顏色、�
   `setsOfColor`／`columnGaps`／`assortmentMatrix` / `buildCss`，**純邏輯不碰 DOM**。
 - **色彩科學核心與 FC／CDA 兩支 lib 逐字相同**——家族三支比對器必須用同一把尺，
   否則「最接近的筆」在不同 app 會給出不同答案。
+- **明細 Modal 的形制與 FC／CDA 逐條對齊**（2026-07-29 收斂）：同一組 class、同一份 CSS 數值
+  ——`.detail-head`（120px 色帶頭，整條就是那個顏色，左下色號、右下色系）→ `.d-name`／`.d-note`
+  → `.copy-row`（4 顆 `.copy-btn`，`var`/`hex`/`rgb`/`class` 順序同 FC）→ 若干 `.d-section`
+  （`h6` ＋ 內容）。三支打開明細看到的是同一張卡，**只有段落內容不同**：FC 是耐光度＋套組、
+  CDA 是事實表＋跨系列色帶、本支是色號分解（`.facts-table`）＋產品線＋套組。
+  **動這段 CSS 前先確認另兩支要不要一起動。**
 - **色票不隨主題重著色**（§4.7）；色塊上文字黑白由 `pickTextColor` 依對比自動選。
 - **hex 是螢幕近似值**：型錄**自己聲明**印刷色與實際墨水不同。耐光度與顏料欄一律空
   （酒精染料非顏料，原廠不公布）。
@@ -66,8 +72,10 @@ CSS 匯出/下載、i18n 三語、主題切換（**色票保留真實顏色、�
 
 - **Materialize 會蓋掉色塊上的字色**：`materialize-dark.css` 有一條 `span` 的顏色規則，
   把 `pickTextColor` 算出、寫在父元素 inline style 的字色蓋掉（實測 span 算出 `#eee`，
-  淺色格變成白字白底、整格看不見）。故 `.cp-cell .c-code` 等一律 `color: inherit`。
-  FC／CDA 沒踩到，是因為它們把文字直接放在元素上、沒有子 span。
+  淺色格變成白字白底、整格看不見）。故 `.cp-cell .c-code`、`.detail-head span`、色系 chips 的
+  `.fam-code`／`.fam-n` 一律 `color: inherit`。**FC 也踩過同一顆**——它的
+  `.detail-head .d-code, .detail-head .d-approx { color: inherit }` 就是同一道解法（2026-07-29 實查）。
+  凡是「字色由 `pickTextColor` 算出、寫在父元素 inline style，而文字包在子 `<span>` 裡」就會中。
 - **`--bg` 曾在深色模式被蓋掉（已於共用件根治）**：`materialize-dark.css` 的
   `html.dark-mode body`（特異性 0,1,1）贏過單純的 `html, body`（0,0,1），深色時 body 變成它的
   `#121212`；本頁多處以 `var(--bg)` 當 sticky 表頭／側欄的遮罩底色，不一致就會出現接縫。
