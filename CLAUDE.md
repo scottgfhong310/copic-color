@@ -21,7 +21,10 @@ public/apps/copic-color/
 ├─ data/copic-colors.js               # window.COPIC_META / COPIC_FAMILIES / COPIC_COLORS（358）
 ├─ data/copic-sets.js                 # window.COPIC_SETS（62 組）
 ├─ materialize-dark.css · side-tool.css · side-tool.js · filter-clear.css · filter-clear.js
-└─ i18n.js · locales/{zh-Hant,en,ja}.js
+├─ i18n.js · locales/{zh-Hant,en,ja}.js
+└─ icons/                             # 中性「三乘三色票矩陣」標記（非 COPIC 品牌 logo）
+   ├─ copic-color-icon(-light).svg    # 母版 tile（深/淺）；PNG 由此光柵化
+   ├─ favicon(.ico/.svg/-light.svg) · icon-{16..512}.png · manifest.json
 ```
 
 無 `routes/`、無 `public/upload/`——唯讀參考 app，資料是烘進前端的靜態 registry。
@@ -56,7 +59,7 @@ CSS 匯出/下載、i18n 三語、主題切換（**色票保留真實顏色、�
 - **hex 是螢幕近似值**：型錄**自己聲明**印刷色與實際墨水不同。耐光度與顏料欄一律空
   （酒精染料非顏料，原廠不公布）。
 
-## 兩個踩過的坑（改 CSS 前先看）
+## 三個踩過的坑（動 CSS 或 icon 前先看）
 
 - **Materialize 會蓋掉色塊上的字色**：`materialize-dark.css` 有一條 `span` 的顏色規則，
   把 `pickTextColor` 算出、寫在父元素 inline style 的字色蓋掉（實測 span 算出 `#eee`，
@@ -68,6 +71,9 @@ CSS 匯出/下載、i18n 三語、主題切換（**色票保留真實顏色、�
   **2026-07-29 已改在權威共用件解決**——該規則改為 `background: var(--bg, var(--mz-bg))`，
   app 有宣告 `--bg` 就採用它。本 app 因此**不需要**在自己的 CSS 裡繞過。
   同一顆也曾讓 `faber-castell-color`／`caran-dache-color`／`color-palette` 的 sticky 標頭出現接縫。
+- **PyMuPDF 光柵化 SVG 有兩個限制**（重產 icon 時會撞到）：① **不渲染 `linearGradient`**，
+  會整片退成黑色——故母版一律純色底；② **以 SVG 宣告的 `width`/`height` 為基準、不是 `viewBox`**，
+  倍率要用「目標 ÷ 實際 page 寬」反推。詳見 DESIGN.md §8.1。
 
 ## 複製件登記（共用件改版時回來同步）
 

@@ -93,9 +93,36 @@ UI 與 README 的聲明都比另兩支更明確。日後若取得官方色見本
 耐光度與顏料索引**一律留空**：COPIC 是酒精性染料（dye）不是顏料（pigment），
 原廠不公布耐光度、也沒有 Colour Index 編號。**空白是資料的事實，不是抽取漏掉。**
 
-## 8. 未做的（已知範圍，非缺陷）
+## 8. App icon（中性矩陣標記、非品牌 logo）
 
-- **App icon**：尚未設計（FC／CDA 都有專屬 icon，本 app 暫用預設）。
+自訂 icon 是一個**三乘三的色票矩陣**——就是本 app 的招牌（§1）縮成一枚標記。
+**刻意不用 COPIC 品牌 logo**（避免冒用商標，§5.5／DESIGN_GUIDELINES），
+也刻意與 `caran-dache-color`（色卡扇）、`color-palette`（金環＋放大鏡）區隔。
+
+- **九格全部是真實 COPIC 色**，不自己配色：三欄＝色系（`RV`／`YG`／`B`），
+  三列＝Intensity（淺→深）——`RV11`/`YG01`/`B02` → `RV04`/`YG05`/`B06` → `RV09`/`YG09`/`B29`。
+  這正是 Copic 體系的頂層（色系 × 明度），icon 本身就在說這支 app 在做什麼。
+- **兩張母版 SVG**（`copic-color-icon.svg` 深 tile／`-light.svg` 淺 tile＋hairline），
+  favicon 深淺兩版（跟 OS `prefers-color-scheme`）＋ `.ico`（16/32/48）／PNG（16–512）
+  ＋ apple-touch 180 ＋ PWA manifest（192/512＋maskable）＋ `theme-color` = `#0f1115`。全照 §5.5 checklist。
+- **favicon 版的格子刻意放大、邊界收窄**：母版的比例縮到 16px 會糊成一塊，
+  favicon 母版改用 26×22 的格子（母版是 20×16），16px 下仍讀得出是九宮格。
+
+### 8.1 光柵化：純色底，因為 PyMuPDF 不畫漸層
+
+`caran-dache-color` 當年因本機無 cairo，改用**瀏覽器 canvas** 光柵化。本 app 改用
+**PyMuPDF（`fitz`）直接把 SVG 轉 PNG**——整條管線留在本機、可重跑、可寫進腳本。
+
+但有一個限制必須知道：**PyMuPDF 不渲染 SVG 的 `linearGradient`，會整片退成黑色**
+（實測：漸層版中心像素 `(0,0,0)`，純色版正常）。因此兩張母版改用**純色底**
+（取原漸層的中點色：深 `#151a24`／淺 `#f6f8fa`）。在 16–512px 的尺度下漸層本來就幾乎看不出來，
+換來的是可重跑的本機管線——這個取捨是刻意的。
+
+另一個坑：**PyMuPDF 以 SVG 宣告的 `width`/`height` 為渲染基準，不是 `viewBox`**。
+倍率要用「目標尺寸 ÷ 實際 page 寬」反推，寫死 `size/100` 會得到完全錯誤的尺寸
+（第一次就踩到，產出 11×11、328×328 這種數字）。
+
+## 9. 未做的（已知範圍，非缺陷）
 - **官方色見本重取 hex**：見 §7。
 - **色名的 zh/ja 在地化**：COPIC 官方色名只有英文一種，型錄未提供其他語言；
   UI 三語只涵蓋介面字串，**色名是資料、不翻譯**（與 FC 同一慣例）。
