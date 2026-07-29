@@ -11,6 +11,8 @@
   --tool-bg:#1b2030; --tool-fg:#e8eaf0;
   --overlay:rgba(10,14,22,.84); --drop-border:#3a4252;
   --axis-head:#a8b0c0; --cell-empty:rgba(255,255,255,.045);
+  --accent-on:#0b1220;                 /* 疊在 --accent 上的字色（深色的 accent 是淡藍 → 用暗字） */
+  --chip-hover:rgba(255,255,255,.07);
 }
 [data-theme="light"] {
   --bg:#f6f8fa; --surface:#fff; --surface-2:#eef1f5;
@@ -19,6 +21,8 @@
   --tool-bg:#fff; --tool-fg:#1f2328;
   --overlay:rgba(240,243,247,.86); --drop-border:#c4ccd6;
   --axis-head:#57606a; --cell-empty:rgba(0,0,0,.04);
+  --accent-on:#fff;                    /* 淺色的 accent 是深藍 → 必須用白字（沿用暗字會看不見） */
+  --chip-hover:rgba(0,0,0,.06);
 }
 
 html.dark-mode, html.light-mode {
@@ -56,20 +60,30 @@ main { min-height: 100vh; }
 .count { font-size: .8rem; color: var(--muted); white-space: nowrap; }
 
 /* ===== 色系 chips ===== */
+/* ⚠️ 這是 <nav>，Materialize 的基底 nav 規則（materialize-dark.css 的
+ * `nav, nav .nav-wrapper` → 底色 var(--mz-surface-2) ＋ box-shadow ＋ height/line-height 64px）
+ * 會把它變成一張浮起來的深色卡片＝畫面上看到的那圈外框。這裡逐條解掉，只留分隔線。
+ * 元素仍用 <nav>（帶 aria-label），不為了避開樣式改標籤。 */
 .family-bar {
   display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
-  margin: 0 0 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
+  margin: 0 0 16px; padding: 0 0 14px; border-bottom: 1px solid var(--border);
+  background: transparent; box-shadow: none; height: auto; line-height: normal;
 }
+/* 無外框（選中才有底色）；分群靠 .fam-sep 那條豎線，不靠每顆的框 */
 .fam-chip {
   display: inline-flex; align-items: baseline; gap: 6px; cursor: pointer;
-  background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
-  padding: 5px 12px; font-size: .85rem; color: var(--text); user-select: none;
-  transition: border-color .12s, background .12s;
+  background: transparent; border: 0; border-radius: 999px;
+  padding: 6px 13px; font-size: .85rem; color: var(--text); user-select: none;
+  transition: background .12s, color .12s;
 }
-.fam-chip:hover { border-color: var(--accent); }
-.fam-chip.active { background: var(--accent); border-color: var(--accent); color: #0b1220; }
+.fam-chip:hover { background: var(--chip-hover); }
+.fam-chip.active, .fam-chip.active:hover { background: var(--accent); color: var(--accent-on); }
 .fam-chip .fam-code { font-weight: 600; letter-spacing: .02em; }
 .fam-chip .fam-n { font-size: .74rem; opacity: .72; }
+/* ⚠️ 同 .cp-cell 那顆坑：materialize-dark.css 有一條 span 的顏色規則（實測 #eee），
+ * 會蓋掉 .fam-chip.active 的字色 → 選中的 chip 變成淺字疊在淺藍 accent 上。
+ * 兩個 span 一律繼承父層。 */
+.fam-chip .fam-code, .fam-chip .fam-n { color: inherit; }
 .fam-sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 4px; }
 
 /* ===== 三軸矩陣 ===== */

@@ -62,6 +62,19 @@
       el.addEventListener('click', function () {
         state.family = f.code;
         localStorage.setItem(KEY_FAM, f.code);
+        // 搜尋結果是跨色系的（排不進單一矩陣），選一個色系在那個狀態下無處可顯示 →
+        // 點 chip 就清掉搜尋、回到該色系的三軸矩陣。這一下必定有作用，chip 不會是死鍵。
+        // （「全部色票」版面則走另一條路：整條 chip bar 收起來，見 render()。）
+        state.layout = 'axis';
+        localStorage.setItem(KEY_LAYOUT, state.layout);
+        var $search = document.getElementById('search');
+        if ($search && $search.value) {
+          $search.value = '';
+          // 派原生 input 事件：本檔的 input handler 會設 state.q='' 並 render()，
+          // 同時 filter-clear 共用件才收得起那顆 × 鈕（它就是聽這個事件同步的）。
+          $search.dispatchEvent(new Event('input', { bubbles: true }));
+          return;
+        }
         render();
       });
       $fams.appendChild(el);
@@ -195,7 +208,11 @@
   }
 
   function render() {
-    renderFamilies();
+    // 「全部色票」是跨色系的版面，色系 chips 在那裡無事可做 → 整條收起，不留按了不動的死鍵
+    // （DESIGN_GUIDELINES §5.13「分組 chips 不可變成死鍵」；回去的路是側鍵的版面切換）。
+    // 只看 state.layout、不看 state.q：搜尋雖然也跨色系，但那時點 chip 會清掉搜尋回矩陣，有作用。
+    $fams.style.display = state.layout === 'flat' ? 'none' : '';
+    if (state.layout !== 'flat') renderFamilies();
     // 搜尋中一律走一維（跨色系的結果排不進單一矩陣）
     if (state.q || state.layout === 'flat') renderFlat();
     else renderAxis();
