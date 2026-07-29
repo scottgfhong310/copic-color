@@ -7,6 +7,8 @@ I18n.register('ja', {
   'search.placeholder': '色番号または色名…',
   'search.empty': '該当する色がありません',
 
+  'family.all': 'すべて',
+
   'tool.layout': 'レイアウト切替：三軸マトリクス / 全色見本',
   'tool.nearest': '最も近い COPIC 色を探す',
   'tool.sets': 'セット収録対照（別タブ）',

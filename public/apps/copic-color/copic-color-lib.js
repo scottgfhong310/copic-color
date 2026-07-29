@@ -47,11 +47,35 @@
     });
   }
 
-  // 色號排序：先色系（官方序），再 Blending Group，再 Intensity；無 bg/iv 者用字串序殿後。
+  /**
+   * 把「字母前綴＋數字尾巴」的色號拆成可比大小的鍵：['C-', 10]。
+   * 灰階（C-00/C-0/C-1…C-10）與無彩（0/100/110）沒有 bg/iv，只能靠色號本身排——
+   * 純字串序會把 C-10 夾在 C-1 與 C-2 之間、把 C-00 排到 C-0 之後，兩者都是錯的。
+   * 全 0 的尾巴（0/00/000）沿用 Intensity 的既有慣例：0 越多越淡、排越前面（記為負值）。
+   * 無數字尾巴者尾數記 0，等同只比前綴。
+   */
+  function codeParts(code) {
+    var s = String(code == null ? '' : code);
+    var m = s.match(/^(.*?)(\d+)$/);
+    if (!m) return [s, 0];
+    var digits = m[2];
+    return [m[1], /^0+$/.test(digits) ? -digits.length : parseInt(digits, 10)];
+  }
+
+  // 色號排序：先色系（官方序），再 Blending Group，再 Intensity；
+  // 無 bg/iv 者（灰階／無彩／螢光）殿後，以「前綴 → 數字」排。
   function codeKey(c, famSort) {
     var f = famSort[c.family] || 99;
-    if (c.bg === undefined || c.bg === null) return [f, 99, 99, c.code];
-    return [f, c.bg, IV_ORDER.indexOf(c.iv === undefined ? '0' : c.iv), c.code];
+    if (c.bg === undefined || c.bg === null) {
+      var p = codeParts(c.code);
+      // 螢光（F）色號＝'F' ＋ 彩色系代碼 ＋ 明度數字（FYG2 ＝ 螢光／YG／2）。型錄是先按明度、
+      // 再按色系順序排，照抄它——退成字母序（FB2 FBG2 FRV1…）會把色相打散。
+      // 判定條件是「去掉 F 之後剩下的是不是一個已知色系」，故只有 F 這種複合色號會走這條。
+      var hue = p[0].charAt(0) === 'F' ? famSort[p[0].slice(1)] : undefined;
+      if (hue !== undefined) return [f, 99, 99, '', p[1], hue];
+      return [f, 99, 99, p[0], p[1], 0];
+    }
+    return [f, c.bg, IV_ORDER.indexOf(c.iv === undefined ? '0' : c.iv), c.code, 0, 0];
   }
   function cmp(a, b) {
     for (var i = 0; i < a.length; i++) {

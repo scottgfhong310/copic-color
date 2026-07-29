@@ -73,7 +73,7 @@ main { min-height: 100vh; }
 .fam-chip {
   display: inline-flex; align-items: baseline; gap: 6px; cursor: pointer;
   background: transparent; border: 0; border-radius: 999px;
-  padding: 6px 13px; font-size: .85rem; color: var(--text); user-select: none;
+  padding: 6px 11px; font-size: .85rem; color: var(--text); user-select: none;
   transition: background .12s, color .12s;
 }
 .fam-chip:hover { background: var(--chip-hover); }
@@ -84,7 +84,9 @@ main { min-height: 100vh; }
  * 會蓋掉 .fam-chip.active 的字色 → 選中的 chip 變成淺字疊在淺藍 accent 上。
  * 兩個 span 一律繼承父層。 */
 .fam-chip .fam-code, .fam-chip .fam-n { color: inherit; }
-.fam-sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 4px; }
+/* 分群豎線。多了「全部」那顆之後 18 顆 chip ＋ 3 條線在 1280px 視窗差幾 px 就會換行，
+ * 故 chip padding 與本條的左右留白都收窄；再窄的視窗照樣 flex-wrap 換行，無妨。 */
+.fam-sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 3px; }
 
 /* ===== 三軸矩陣 ===== */
 .axis-wrap { overflow-x: auto; }              /* 寬表自己捲，頁面不橫捲 */
@@ -101,6 +103,10 @@ main { min-height: 100vh; }
 .axis-table td { padding: 0; }
 
 .cell-empty { width: 72px; height: 44px; border-radius: 6px; background: var(--cell-empty); }
+
+/* 沒有 bg/iv 兩軸的色系（灰階／無彩／螢光）：同一種色塊排成一列。
+ * gap 對齊 .axis-table 的 border-spacing，看起來就是「同一張表少了兩條軸」。 */
+.cell-row { display: flex; flex-wrap: wrap; gap: 4px; }
 
 .cp-cell {
   width: 72px; height: 44px; border-radius: 6px; cursor: pointer;

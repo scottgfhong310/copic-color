@@ -41,43 +41,57 @@
 
   // ---- 色系 chips ---------------------------------------------------------
 
+  function chipNode(code, label, n, active, onClick) {
+    var el = document.createElement('button');
+    el.type = 'button';
+    el.className = 'fam-chip' + (active ? ' active' : '');
+    el.title = label;
+    el.innerHTML = '<span class="fam-code"></span><span class="fam-n"></span>';
+    el.querySelector('.fam-code').textContent = code;
+    el.querySelector('.fam-n').textContent = n;
+    el.addEventListener('click', onClick);
+    return el;
+  }
+
+  function sepNode() {
+    var sep = document.createElement('span');
+    sep.className = 'fam-sep';
+    return sep;
+  }
+
   function renderFamilies() {
     $fams.innerHTML = '';
+
+    // 「全部」＝取消色系選擇的那顆。分組 chips 恆有一個 active、無法取消，
+    // 所以「看全部」必須自己是一顆 chip；否則使用者選了色系就出不去
+    // （側鍵的版面切換做得到，但那不是使用者會去找的地方）。
+    $fams.appendChild(chipNode(
+      t('family.all', '全部'), t('family.all', '全部'), COLORS.length,
+      state.layout === 'flat',
+      function () {
+        state.layout = 'flat';
+        localStorage.setItem(KEY_LAYOUT, state.layout);
+        render();
+      }
+    ));
+    $fams.appendChild(sepNode());
+
     var prevChromatic = null;
     FAMS.forEach(function (f) {
-      if (prevChromatic !== null && f.chromatic !== prevChromatic) {
-        var sep = document.createElement('span');
-        sep.className = 'fam-sep';
-        $fams.appendChild(sep);
-      }
+      if (prevChromatic !== null && f.chromatic !== prevChromatic) $fams.appendChild(sepNode());
       prevChromatic = f.chromatic;
       var n = COLORS.filter(function (c) { return c.family === f.code; }).length;
-      var el = document.createElement('button');
-      el.type = 'button';
-      el.className = 'fam-chip' + (f.code === state.family ? ' active' : '');
-      el.title = f.name;
-      el.innerHTML = '<span class="fam-code"></span><span class="fam-n"></span>';
-      el.querySelector('.fam-code').textContent = f.code;
-      el.querySelector('.fam-n').textContent = n;
-      el.addEventListener('click', function () {
-        state.family = f.code;
-        localStorage.setItem(KEY_FAM, f.code);
-        // 搜尋結果是跨色系的（排不進單一矩陣），選一個色系在那個狀態下無處可顯示 →
-        // 點 chip 就清掉搜尋、回到該色系的三軸矩陣。這一下必定有作用，chip 不會是死鍵。
-        // （「全部色票」版面則走另一條路：整條 chip bar 收起來，見 render()。）
-        state.layout = 'axis';
-        localStorage.setItem(KEY_LAYOUT, state.layout);
-        var $search = document.getElementById('search');
-        if ($search && $search.value) {
-          $search.value = '';
-          // 派原生 input 事件：本檔的 input handler 會設 state.q='' 並 render()，
-          // 同時 filter-clear 共用件才收得起那顆 × 鈕（它就是聽這個事件同步的）。
-          $search.dispatchEvent(new Event('input', { bubbles: true }));
-          return;
+      $fams.appendChild(chipNode(
+        f.code, f.name, n,
+        state.layout !== 'flat' && f.code === state.family,
+        function () {
+          state.family = f.code;
+          state.layout = 'axis';
+          localStorage.setItem(KEY_FAM, f.code);
+          localStorage.setItem(KEY_LAYOUT, state.layout);
+          render();
         }
-        render();
-      });
-      $fams.appendChild(el);
+      ));
     });
   }
 
@@ -121,7 +135,12 @@
     if (!g.bgs.length) {           // 灰階 / 無彩 / 螢光：改一維
       $axis.style.display = 'block';
       $flat.style.display = 'none';
-      renderFlatInto($axis, g.flat, true);
+      // 用矩陣同一種色塊排成一列，不是大張的 .cp-card——同樣是「看一個色系」，
+      // 換個色系不該連色票的形制都變。少的是那兩條軸，不是色票的樣子。
+      var row = document.createElement('div');
+      row.className = 'cell-row';
+      L.sortColors(g.flat, 'code', FAMS).forEach(function (c) { row.appendChild(cellNode(c)); });
+      $axis.appendChild(row);
       $count.textContent = g.flat.length + ' / ' + COLORS.length;
       $none.style.display = 'none';
       return;
@@ -186,33 +205,24 @@
     return el;
   }
 
-  function renderFlatInto(host, list, append) {
-    var box = host;
-    if (append) {
-      box = document.createElement('div');
-      box.className = 'flat-list';
-      host.appendChild(box);
-    } else {
-      box.innerHTML = '';
-    }
-    list.forEach(function (c) { box.appendChild(cardNode(c)); });
-  }
-
+  // 大張色票卡（帶色名與 hex）只用在跨色系的清單：「全部」與搜尋結果。
+  // 單一色系內一律用矩陣那種色塊（見 renderAxis），形制才一致。
   function renderFlat() {
     var list = L.sortColors(L.filter(COLORS, state.q), 'code', FAMS);
     $axis.style.display = 'none';
     $flat.style.display = list.length ? 'grid' : 'none';
     $none.style.display = list.length ? 'none' : 'block';
-    renderFlatInto($flat, list, false);
+    $flat.innerHTML = '';
+    list.forEach(function (c) { $flat.appendChild(cardNode(c)); });
     $count.textContent = list.length + ' / ' + COLORS.length;
   }
 
   function render() {
-    // 「全部色票」是跨色系的版面，色系 chips 在那裡無事可做 → 整條收起，不留按了不動的死鍵
-    // （DESIGN_GUIDELINES §5.13「分組 chips 不可變成死鍵」；回去的路是側鍵的版面切換）。
-    // 只看 state.layout、不看 state.q：搜尋雖然也跨色系，但那時點 chip 會清掉搜尋回矩陣，有作用。
-    $fams.style.display = state.layout === 'flat' ? 'none' : '';
-    if (state.layout !== 'flat') renderFamilies();
+    // 搜尋中整條 chip bar 收起（DESIGN_GUIDELINES §5.13「分組 chips 不可變成死鍵」）：
+    // 搜尋結果跨色系，這時留著一顆亮起的色系 chip 只會讓人以為看到的是那個色系的色。
+    // 「全部色票」則相反——它自己就是 bar 裡的第一顆 chip，bar 要留著才取消得掉選擇。
+    $fams.style.display = state.q ? 'none' : '';
+    if (!state.q) renderFamilies();
     // 搜尋中一律走一維（跨色系的結果排不進單一矩陣）
     if (state.q || state.layout === 'flat') renderFlat();
     else renderAxis();

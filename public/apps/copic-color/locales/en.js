@@ -7,6 +7,8 @@ I18n.register('en', {
   'search.placeholder': 'Code or name…',
   'search.empty': 'No matching colour',
 
+  'family.all': 'All',
+
   'tool.layout': 'Layout: three-axis grid / all swatches',
   'tool.nearest': 'Find the nearest COPIC colour',
   'tool.sets': 'Assortment coverage (new tab)',

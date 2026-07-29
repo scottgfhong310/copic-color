@@ -7,6 +7,8 @@ I18n.register('zh-Hant', {
   'search.placeholder': '色號或色名…',
   'search.empty': '找不到符合的顏色',
 
+  'family.all': '全部',
+
   'tool.layout': '切換版面：三軸矩陣 / 全部色票',
   'tool.nearest': '找最接近的 COPIC 色',
   'tool.sets': '套組收錄對照（另開分頁）',
