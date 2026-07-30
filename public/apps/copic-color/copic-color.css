@@ -287,6 +287,7 @@ main { min-height: 100vh; }
 .detail-head .d-tag { font-size: .82rem; opacity: .92; text-align: right; }
 .detail-body { padding: 16px 20px 6px; }
 .detail-body .d-name { font-size: 1.05rem; font-weight: 500; color: var(--text); }
+.detail-body .d-name-loc { font-size: .86rem; color: var(--muted); margin-top: 1px; }
 .detail-body .d-note { font-size: .74rem; color: var(--muted); margin: 6px 0 12px; }
 
 /* 複製鈕列 */

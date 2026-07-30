@@ -43,6 +43,8 @@
     return colors.filter(function (c) {
       return c.code.toLowerCase().indexOf(s) >= 0
           || String(c.name || '').toLowerCase().indexOf(s) >= 0
+          || String(c.nameZh || '').toLowerCase().indexOf(s) >= 0
+          || String(c.nameJa || '').toLowerCase().indexOf(s) >= 0
           || c.hex.toLowerCase().indexOf(s) >= 0;
     });
   }
