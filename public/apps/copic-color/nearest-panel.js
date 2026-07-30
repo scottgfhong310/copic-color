@@ -33,7 +33,54 @@
     return (v && v !== key) ? v : fb;
   }
 
+  function tp(key, params, fb) {
+    if (global.I18n && global.I18n.t) {
+      var v = global.I18n.t(key, params);
+      if (v && v !== key) return v;
+    }
+    return fb;
+  }
+
   function colors() { return global.COPIC_COLORS || []; }
+
+  // 從一段文字裡認出顏色。**認得本 app 自己複製出去的格式**——明細的四顆複製鈕給的是
+  // `var(--copic-g43)` / `#97b564` / `rgb(151, 181, 100)` / `copic-bg-g43`，其中後兩者與 hex
+  // 都在這裡吃得下；也認得夾在一整行 CSS 裡的 hex（`--copic-g43: #97b564;`）。
+  // 認不出來就回 null，由呼叫端說明，**不猜、也不默默套一個顏色**。
+  function parseColorText(text) {
+    var s = String(text || '').trim();
+    if (!s) return null;
+    var m = /rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/i.exec(s);
+    if (m) {
+      var v = [+m[1], +m[2], +m[3]];
+      if (v.every(function (n) { return n <= 255; })) {
+        return '#' + v.map(function (n) { return ('0' + n.toString(16)).slice(-2); }).join('');
+      }
+    }
+    m = /(?:^|[^0-9a-z])#?([0-9a-f]{6})(?![0-9a-z])/i.exec(s);
+    if (m) return '#' + m[1].toLowerCase();
+    m = /(?:^|[^0-9a-z])#([0-9a-f]{3})(?![0-9a-z])/i.exec(s);   // 三碼一律要 #，否則 358／214 這種數字也會中
+    if (m) return '#' + m[1].toLowerCase().split('').map(function (c) { return c + c; }).join('');
+    return null;
+  }
+
+  function pasteFromClipboard() {
+    var fail = function () {
+      M.toast({ html: t('toast.pasteFail', '無法讀取剪貼簿（瀏覽器未授權）'), classes: 'red' });
+    };
+    if (!navigator.clipboard || !navigator.clipboard.readText) return fail();
+    navigator.clipboard.readText().then(function (txt) {
+      var hex = parseColorText(txt);
+      if (!hex) {
+        M.toast({ html: t('toast.pasteNoColor', '剪貼簿裡沒有可辨識的顏色'), classes: 'orange' });
+        return;
+      }
+      document.getElementById('nearest-hex').value = hex;
+      document.getElementById('nearest-input').value = hex;
+      render();
+      M.toast({ html: tp('toast.pasted', { v: hex }, '已貼上：' + hex), displayLength: 1400 });
+    }).catch(fail);
+  }
 
   var MARKUP =
     '<li><a class="subheader"><i class="material-icons">colorize</i>' +
@@ -44,6 +91,9 @@
         '<input id="nearest-input" type="color" value="#0078be" />' +
         '<input id="nearest-hex" type="text" value="#0078be" spellcheck="false" autocomplete="off" ' +
                'data-i18n-placeholder="nearest.placeholder" placeholder="#RRGGBB" />' +
+        '<button id="nearest-paste" class="nearest-paste" type="button" ' +
+                'data-i18n-title="nearest.paste" title="從剪貼簿貼上">' +
+          '<i class="material-icons">content_paste</i></button>' +
         '<select id="nearest-line" class="browser-default"></select>' +
       '</div>' +
       '<div class="nearest-hint" data-i18n="nearest.hint"></div>' +
@@ -140,6 +190,7 @@
       if (/^#[0-9a-fA-F]{6}$/.test($hex.value)) { $pick.value = $hex.value.toLowerCase(); render(); }
     });
     document.getElementById('nearest-line').addEventListener('change', render);
+    document.getElementById('nearest-paste').addEventListener('click', pasteFromClipboard);
 
     if (global.I18n && global.I18n.apply) global.I18n.apply(el);
   }

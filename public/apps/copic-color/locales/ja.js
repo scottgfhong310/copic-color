@@ -29,6 +29,7 @@ I18n.register('ja', {
   'nearest.hint': 'CIEDE2000（ΔE00）で比較します。製品ラインを指定すると、そのラインに実際にある色だけを提案します。',
   'nearest.allLines': '全 358 色（Sketch / Copic Ink）',
   'nearest.placeholder': '#RRGGBB',
+  'nearest.paste': 'クリップボードから貼り付け',
 
   'band.very': 'ごく近い',
   'band.close': '近い',
@@ -64,6 +65,9 @@ I18n.register('ja', {
 
   'toast.copied': 'コピーしました',
   'toast.copyFail': 'コピーに失敗しました（localhost または HTTPS が必要）',
+  'toast.pasted': '貼り付けました：{v}',
+  'toast.pasteFail': 'クリップボードを読み取れません（許可されていません）——フィールドに \u2318V で直接貼り付けてください',
+  'toast.pasteNoColor': 'クリップボードに色が見つかりません',
   'toast.lang': '{name} に切り替えました',
   'toast.downloaded': 'ダウンロード：{n}'
 }, '日本語');

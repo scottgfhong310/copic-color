@@ -29,6 +29,7 @@ I18n.register('en', {
   'nearest.hint': 'Matched with CIEDE2000 (ΔE00). Restrict to a product line and only colours that line actually ships are suggested — no point recommending a marker you cannot buy.',
   'nearest.allLines': 'All 358 colours (Sketch / Copic Ink)',
   'nearest.placeholder': '#RRGGBB',
+  'nearest.paste': 'Paste from clipboard',
 
   'band.very': 'excellent match',
   'band.close': 'close',
@@ -64,6 +65,9 @@ I18n.register('en', {
 
   'toast.copied': 'Copied',
   'toast.copyFail': 'Copy failed (needs localhost or HTTPS)',
+  'toast.pasted': 'Pasted: {v}',
+  'toast.pasteFail': "Can't read the clipboard (permission denied) — paste into the field with \u2318V instead",
+  'toast.pasteNoColor': 'No colour found in the clipboard',
   'toast.lang': 'Switched to {name}',
   'toast.downloaded': 'Downloaded: {n}'
 }, 'English');

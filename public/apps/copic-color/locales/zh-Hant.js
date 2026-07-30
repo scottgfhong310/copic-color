@@ -29,6 +29,7 @@ I18n.register('zh-Hant', {
   'nearest.hint': '以 CIEDE2000（ΔE00）比對。限定產品線後，只會推薦那條線真的有出的色——手上沒有的筆別推薦。',
   'nearest.allLines': '全部 358 色（Sketch / Copic Ink）',
   'nearest.placeholder': '#RRGGBB',
+  'nearest.paste': '從剪貼簿貼上',
 
   'band.very': '極接近',
   'band.close': '接近',
@@ -64,6 +65,9 @@ I18n.register('zh-Hant', {
 
   'toast.copied': '已複製',
   'toast.copyFail': '複製失敗（需 localhost 或 HTTPS）',
+  'toast.pasted': '已貼上：{v}',
+  'toast.pasteFail': '無法讀取剪貼簿（瀏覽器未授權）——可直接在欄位按 ⌘V 貼上',
+  'toast.pasteNoColor': '剪貼簿裡沒有可辨識的顏色',
   'toast.lang': '已切換為 {name}',
   'toast.downloaded': '已下載：{n}'
 }, '繁體中文');
