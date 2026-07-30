@@ -91,9 +91,18 @@
   display: inline-block; max-height: calc(var(--h-subset) - 10px);
   overflow: hidden; font-size: .72rem; color: var(--muted); font-weight: 500;
 }
+/* 序號格：內容一律鎖成一行。
+ * ⚠️ 這一列的高度**不能**由內容決定——後面幾列的 sticky top 是用上面宣告的 --h-* 累加的，
+ * 內容一撐高（'with the book' 在 30px 欄寬裡折三行 → 實測 45px）下一列就會疊上來。
+ * 全文放 title；套組全名在尺寸格的 title 與選中後的 chip 上也看得到，資訊沒有掉。 */
 .assort thead .c-sidx {
   font-family: ui-monospace, monospace; font-size: .7rem; color: var(--muted);
   border-left: 1px solid var(--border);
+  height: var(--h-sidx); overflow: hidden;
+}
+.assort thead .c-sidx > span {
+  display: block; max-width: calc(var(--w-col) - 4px); margin: 0 auto;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .assort .c-size {
   width: var(--w-col); min-width: var(--w-col); cursor: pointer;

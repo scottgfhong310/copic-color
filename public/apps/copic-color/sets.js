@@ -118,9 +118,13 @@
       return '<th class="c-subset" colspan="' + g.span + '" title="' + esc(label) + '">' +
         '<span class="vtext">' + esc(label) + '</span></th>';
     }).join('');
-    // 第 3 列：子系列內的序號
+    // 第 3 列：子系列內的序號。
+    // ⚠️ 值不一定是短碼——'with the book' 這種會在 30px 欄寬裡折成三行、把整列撐高，
+    // 而下一列的 sticky top 是用**宣告高度**累加的，撐高就會疊上來。故包一層 span 以
+    // nowrap ＋ ellipsis 鎖成一行，全文放 title（套組全名在尺寸格的 title 裡也看得到）。
     var h3 = cols.map(function (s) {
-      return '<th class="c-sidx">' + esc(s.subsetIndex || '－') + '</th>';
+      var v = s.subsetIndex || '－';
+      return '<th class="c-sidx"><span title="' + esc(v) + '">' + esc(v) + '</span></th>';
     }).join('');
     // 第 4 列：尺寸（點它＝選為基準組）
     var h4 = cols.map(function (s, ci) {
