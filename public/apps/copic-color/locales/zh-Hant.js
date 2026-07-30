@@ -28,6 +28,7 @@ I18n.register('zh-Hant', {
   'nearest.title': '找最接近的 COPIC 色',
   'nearest.hint': '以 CIEDE2000（ΔE00）比對。限定產品線後，只會推薦那條線真的有出的色——手上沒有的筆別推薦。',
   'nearest.allLines': '全部 358 色（Sketch / Copic Ink）',
+  'nearest.placeholder': '#RRGGBB',
 
   'detail.close': '關閉',
   'detail.lines': '產品線',

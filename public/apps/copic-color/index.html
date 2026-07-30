@@ -42,6 +42,32 @@
 
 <body data-i18n-doctitle="title.page">
 
+  <!-- ===== 最接近色側欄（形制同 markdown-reader 的檔案清單側欄：右緣 sidenav） =====
+       原本是 Modal，但「查一次 → 讀一張色票 → 再回來看第二名」得把 Modal 關掉再重開、
+       條件也跟著沒了。改成側欄後查詢條件常駐，點結果直接開明細，明細關掉就回到同一份清單。 -->
+  <ul id="nearest-panel" class="sidenav nearest-panel" style="width: 360px;">
+    <li>
+      <a class="subheader">
+        <i class="material-icons">colorize</i>
+        <span data-i18n="nearest.title">找最接近的 COPIC 色</span>
+      </a>
+    </li>
+    <li><div class="divider"></div></li>
+    <li>
+      <div class="nearest-form">
+        <input id="nearest-input" type="color" value="#0078be" />
+        <input id="nearest-hex" type="text" value="#0078be" spellcheck="false" autocomplete="off"
+               data-i18n-placeholder="nearest.placeholder" placeholder="#RRGGBB" />
+        <select id="nearest-line" class="browser-default"></select>
+      </div>
+      <div class="nearest-hint" data-i18n="nearest.hint">
+        以 CIEDE2000（ΔE00）比對。限定產品線後，只會推薦那條線真的有出的色。
+      </div>
+    </li>
+    <li><div class="divider"></div></li>
+    <div id="nearest-result" class="nearest-result"></div>
+  </ul>
+
   <main>
     <div class="app-container">
 
@@ -108,25 +134,6 @@
     <div class="modal-footer">
       <a href="#!" id="css-copy" class="waves-effect btn-flat"><i class="material-icons left">content_copy</i><span data-i18n="css.copy">複製全部</span></a>
       <a href="#!" id="css-download" class="waves-effect btn-flat"><i class="material-icons left">file_download</i><span data-i18n="css.download">下載 .css</span></a>
-      <a href="#!" class="modal-close waves-effect btn-flat" data-i18n="detail.close">關閉</a>
-    </div>
-  </div>
-
-  <!-- ===== 最接近色 Modal ===== -->
-  <div id="nearest-modal" class="modal nearest-modal">
-    <div class="modal-content">
-      <h5 data-i18n="nearest.title">找最接近的 COPIC 色</h5>
-      <div class="nearest-form">
-        <input id="nearest-input" type="color" value="#0078be" />
-        <input id="nearest-hex" type="text" value="#0078be" spellcheck="false" autocomplete="off" />
-        <select id="nearest-line" class="browser-default"></select>
-      </div>
-      <div class="nearest-hint" data-i18n="nearest.hint">
-        以 CIEDE2000（ΔE00）比對。限定產品線後，只會推薦那條線真的有出的色。
-      </div>
-      <div id="nearest-result" class="nearest-result"></div>
-    </div>
-    <div class="modal-footer">
       <a href="#!" class="modal-close waves-effect btn-flat" data-i18n="detail.close">關閉</a>
     </div>
   </div>

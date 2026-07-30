@@ -28,6 +28,7 @@ I18n.register('ja', {
   'nearest.title': '最も近い COPIC 色を探す',
   'nearest.hint': 'CIEDE2000（ΔE00）で比較します。製品ラインを指定すると、そのラインに実際にある色だけを提案します。',
   'nearest.allLines': '全 358 色（Sketch / Copic Ink）',
+  'nearest.placeholder': '#RRGGBB',
 
   'detail.close': '閉じる',
   'detail.lines': '製品ライン',

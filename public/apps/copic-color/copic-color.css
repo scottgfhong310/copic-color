@@ -127,7 +127,7 @@ main { min-height: 100vh; }
  * 於是淺色格變成白字白底、整格看不見）。這裡強制繼承父層。
  * FC / CDA 沒踩到是因為它們把文字直接放在元素上，沒有子 span。 */
 .cp-cell .c-code, .cp-cell .c-lines,
-.cp-swatch span, .detail-head span, .near-sw span { color: inherit; }
+.cp-swatch span, .detail-head span { color: inherit; }
 
 /* ===== 一維色票列（搜尋結果 / 非彩色系） ===== */
 .flat-list {
@@ -158,8 +158,8 @@ main { min-height: 100vh; }
 .line-badge.on { border-color: var(--accent); color: var(--accent); }
 
 /* ===== Modal ===== */
-.css-modal .modal-content, .nearest-modal .modal-content { background: var(--surface); color: var(--text); }
-.css-modal .modal-footer, .nearest-modal .modal-footer { background: var(--surface); }
+.css-modal .modal-content { background: var(--surface); color: var(--text); }
+.css-modal .modal-footer { background: var(--surface); }
 .css-sub { font-size: .82rem; color: var(--muted); margin-bottom: 10px; }
 .css-modal pre {
   max-height: 52vh; overflow: auto; background: var(--bg); border: 1px solid var(--border);
@@ -167,22 +167,69 @@ main { min-height: 100vh; }
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-.nearest-form { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-.nearest-form input[type="color"] { width: 54px; height: 38px; padding: 0; border: 1px solid var(--border); border-radius: 8px; background: none; cursor: pointer; }
+/* ===== 最接近色側欄（sidenav drawer） =====
+ * 形制沿用 markdown-reader 的檔案清單側欄：右緣、subheader ＋ divider ＋ 清單，
+ * 開啟時 body.sidenav-open 由共用 side-tool.css 把整排側鍵淡出。
+ * ⚠️ Materialize 的 .sidenav 預設貼左緣；edge:'right' 會加 .right-aligned，
+ * 這裡再以 !important 釘一次（同 markdown-reader），避免版本差異讓它跑回左邊。 */
+.sidenav {
+  background: var(--surface) !important;
+  left: auto !important;
+  right: 0 !important;
+  display: flex; flex-direction: column;      /* 表單固定在上、結果清單自己捲 */
+}
+.sidenav .subheader {
+  height: auto !important; min-height: 0 !important; line-height: 1.4 !important;
+  padding: 14px 18px !important; display: flex; align-items: center; gap: 8px;
+  color: var(--muted) !important; font-size: .92rem;
+}
+.sidenav .subheader .material-icons { color: var(--muted) !important; margin: 0; }
+.sidenav .subheader span { color: inherit; }
+.sidenav .divider { background-color: var(--border) !important; }
+/* Materialize 給 .sidenav li 的固定行高會把整塊表單撐開，這裡解掉 */
+.nearest-panel li { line-height: normal; }
+
+.nearest-form { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 18px 0; }
+.nearest-form input[type="color"] {
+  width: 46px; height: 36px; padding: 0; border: 1px solid var(--border); border-radius: 8px;
+  background: none; cursor: pointer; flex: 0 0 auto;
+}
 .nearest-form input[type="text"] {
-  width: 130px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
-  color: var(--text); padding: 7px 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  flex: 1 1 auto; min-width: 0; width: auto;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); padding: 7px 10px; height: 36px; margin: 0; box-sizing: border-box;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .84rem;
 }
 .nearest-form select {
+  flex: 1 0 100%; width: 100%;
   background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
-  color: var(--text); padding: 7px 10px; font-size: .88rem;
+  color: var(--text); padding: 7px 10px; font-size: .82rem; height: 36px;
 }
-.nearest-hint { font-size: .78rem; color: var(--muted); margin-bottom: 12px; }
-.nearest-result { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-.near-item { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; cursor: pointer; }
-.near-sw { height: 44px; display: flex; align-items: flex-end; padding: 4px 7px; font-size: .74rem; font-weight: 700; }
-.near-meta { padding: 6px 8px; font-size: .74rem; color: var(--muted); }
-.near-de { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.nearest-hint { font-size: .74rem; color: var(--muted); padding: 10px 18px 12px; line-height: 1.45; }
+
+/* 結果清單：側欄是窄長條，故改成一列一色（原本 Modal 內是網格）。
+ * 這塊自己捲，表單與提示留在上方不動。 */
+.nearest-result { flex: 1 1 auto; overflow-y: auto; padding: 8px 12px 24px; }
+.near-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 6px; margin-bottom: 6px; border: 1px solid var(--border); border-radius: 10px;
+  background: transparent; cursor: pointer; text-align: left;
+  transition: background .12s, border-color .12s;
+}
+.near-item:hover { background: var(--chip-hover); }
+.near-item.active { border-color: var(--accent); background: var(--chip-hover); }
+.near-sw {
+  flex: 0 0 auto; width: 62px; height: 42px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .74rem; font-weight: 700; border: 1px solid rgba(0,0,0,.10);
+}
+.near-meta { min-width: 0; flex: 1 1 auto; }
+.near-name {
+  display: block; font-size: .82rem; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.near-sub { display: flex; gap: 8px; align-items: baseline; font-size: .72rem; color: var(--muted); }
+.near-hex, .near-de { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .band-very { color: #34c38f; } .band-close { color: #7fb3ff; }
 .band-noticeable { color: #e8b04b; } .band-far { color: #e07a6b; }
 

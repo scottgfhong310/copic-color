@@ -28,6 +28,7 @@ I18n.register('en', {
   'nearest.title': 'Find the nearest COPIC colour',
   'nearest.hint': 'Matched with CIEDE2000 (ΔE00). Restrict to a product line and only colours that line actually ships are suggested — no point recommending a marker you cannot buy.',
   'nearest.allLines': 'All 358 colours (Sketch / Copic Ink)',
+  'nearest.placeholder': '#RRGGBB',
 
   'detail.close': 'Close',
   'detail.lines': 'Product lines',
