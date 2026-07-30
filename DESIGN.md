@@ -74,6 +74,13 @@ FC 的 `nearestFC` 預設只比 `ag`（不推薦 Black Edition 那條 hobby 線�
 **只要使用者需要「拿著結果去看別的東西、再回來」，就不該用 Modal 裝**——
 那是側欄的工作。判準在流程，不在內容多寡。
 
+**兩頁共用（隨後補上）**：`sets.html` 也要這個側欄，於是它比照 `colour-detail.js`
+抽成 `nearest-panel.js`（`window.CopicNearest`）——**碰 DOM 所以不進 lib，但兩頁都要用
+所以也不留在任一控制器裡**（DESIGN_GUIDELINES §4.1 的第三種模組，本 app 第二次用到這個形狀）。
+markup 由模組自己注入，差異行為用 `onPick` callback 交呼叫端，模組不判斷「我在哪一頁」。
+**在套組頁它比在色票頁更有用**：找到最接近的筆 → 明細裡的套組是可點的 → 就地換基準組，
+「這個顏色該拿哪支筆 → 那支筆收在哪一盒」一條路走完，不必跳頁。
+
 ## 5. 套組頁：為什麼預設只比同產品線
 
 形制沿用 `faber-castell-color/sets.html`（家族第一支雙頁 app 收斂出來的）：

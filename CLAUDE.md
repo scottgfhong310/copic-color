@@ -19,6 +19,7 @@ public/apps/copic-color/
 ├─ index.html · copic-color.css · copic-color.js · copic-color-lib.js   # 主頁：三軸瀏覽
 ├─ sets.html · sets.css · sets.js     # 第二頁：套組收錄對照
 ├─ colour-detail.js                   # 兩頁共用的色票明細 Modal（碰 DOM，故不在 lib）
+├─ nearest-panel.js                   # 兩頁共用的最接近色側欄（同上，第三種模組）
 ├─ data/copic-colors.js               # window.COPIC_META / COPIC_FAMILIES / COPIC_COLORS（358）
 ├─ data/copic-sets.js                 # window.COPIC_SETS（62 組）
 ├─ materialize-dark.css · side-tool.css · side-tool.js · filter-clear.css · filter-clear.js
@@ -42,7 +43,8 @@ chip bar 18 顆（「全部 358」＋ 17 色系，單行不換行）、三軸矩
 灰階/無彩/螢光自動切一維（**用矩陣同一種色塊**，非大張色票卡）、
 搜尋切一維且 **chip bar 收起**（結果跨色系）、點色票開明細（四種複製格式 ＋ 色號分解 ＋ 產品線 ＋ 套組）、
 最接近色**側欄**（右緣 sidenav，形制同 markdown-reader 的檔案清單；限定產品線後只出該線的色、
-點結果開明細而**側欄不關**）、`sets.html` 深連結 `?set=`、
+點結果開明細而**側欄不關**；**兩頁都有**——在 `sets.html` 上「找到最接近的筆 → 明細點套組 →
+就地換基準組」一條路走完）、`sets.html` 深連結 `?set=`、
 CSS 匯出/下載、i18n 三語、主題切換（**色票保留真實顏色、只有外殼跟主題**）。
 
 ## 本 app 的 canon 重點

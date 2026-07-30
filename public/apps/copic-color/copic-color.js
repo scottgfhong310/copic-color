@@ -271,7 +271,9 @@
       M.toast({ html: I18n.t('toast.lang', { name: I18n.name(next) }), displayLength: 1400 });
     });
     // i18n 引擎切語言後自己 apply DOM，但動態產生的節點要重畫（§4：控制器負責重繪）
-    document.addEventListener('i18n:changed', function () { render(); CopicDetail.refresh(); });
+    document.addEventListener('i18n:changed', function () {
+      render(); CopicDetail.refresh(); CopicNearest.refresh();   // 側欄常駐、可能正開著
+    });
 
     var cssModal = M.Modal.init(document.getElementById('css-modal'), { preventScrolling: false });
     document.getElementById('setting-css').addEventListener('click', function () {
@@ -300,107 +302,11 @@
     document.getElementById('css-download').addEventListener('click', download);
     document.getElementById('setting-download').addEventListener('click', download);
 
-    initNearest();
-  }
-
-  // ---- 最接近色（右緣側欄；形制同 markdown-reader 的檔案清單） ---------------
-  //
-  // 從 Modal 改成 sidenav 的理由是**流程**而不是版面：比對是「查一次、逐一讀」的動作，
-  // Modal 一次只能站一個，讀第一名就得把查詢條件關掉。側欄常駐後，明細 Modal 疊在它上面開，
-  // 關掉明細就回到同一份清單，還留著選中那列的高亮，接著看第二名。
-  // 側欄也比 Modal 高，所以結果由 6 筆放寬到 12 筆（ΔE 已排序，看不看得下去由使用者決定）。
-
-  var NEAR_N = 12;
-
-  // ΔE 級距的中文說法（lib 的 deltaEBand 只回代號）。字典缺鍵時的 fallback；
-  // 文案與 caran-dache-color 的 band.* 逐字相同——同一把尺、同一組級距，讀法也該一樣。
-  var BAND_FB = { very: '極接近', close: '接近', noticeable: '可辨差異', far: '差異大' };
-
-  function initNearest() {
-    var $panel = document.getElementById('nearest-panel');
-    var panel = M.Sidenav.init($panel, {
-      edge: 'right',
-      // 側欄開啟時把整排側鍵淡出（共用 side-tool.css 的 body.sidenav-open）
-      onOpenStart: function () { document.body.classList.add('sidenav-open'); },
-      onCloseEnd: function () { document.body.classList.remove('sidenav-open'); }
-    });
-    var $pick = document.getElementById('nearest-input');
-    var $hex = document.getElementById('nearest-hex');
-    var $line = document.getElementById('nearest-line');
-    var $out = document.getElementById('nearest-result');
-
-    function fillLines() {
-      var keep = $line.value;
-      $line.innerHTML = '';
-      var all = document.createElement('option');
-      all.value = '';
-      all.textContent = t('nearest.allLines', '全部 358 色（Sketch / Copic Ink）');
-      $line.appendChild(all);
-      (META.lines || []).forEach(function (l) {
-        if (l.id === 'sketch' || l.id === 'ink') return;    // 這兩條就是全色域
-        var o = document.createElement('option');
-        o.value = l.id;
-        o.textContent = l.name + '（' + l.count + '）';
-        $line.appendChild(o);
-      });
-      $line.value = keep;                                   // 換語言重建選項時保住當下選擇
-    }
-
-    function itemNode(m, c) {
-      var el = document.createElement('button');
-      el.type = 'button';
-      el.className = 'near-item';
-      el.innerHTML =
-        '<span class="near-sw"></span>' +
-        '<span class="near-meta">' +
-          '<span class="near-name"></span>' +
-          '<span class="near-sub"><span class="near-hex"></span>' +
-          '<span class="near-de band-' + m.band + '"></span></span>' +
-        '</span>';
-      // 色塊字色由對比算出、寫在色塊自己身上（文字直接放在它裡面，不再包一層 span，
-      // 免得 Materialize 的 span 色規則把它蓋掉——.cp-cell 踩過那顆）
-      var sw = el.querySelector('.near-sw');
-      sw.style.background = m.hex;
-      sw.style.color = L.pickTextColor(c);
-      sw.textContent = m.code;
-      el.querySelector('.near-name').textContent = m.name || '';
-      el.querySelector('.near-hex').textContent = m.hex;
-      el.querySelector('.near-de').textContent =
-        'ΔE ' + m.deltaE.toFixed(2) + ' · ' + t('band.' + m.band, BAND_FB[m.band]);
-      el.addEventListener('click', function () {
-        // 側欄不關：明細看完退回來還在同一份結果上
-        var prev = $out.querySelector('.near-item.active');
-        if (prev) prev.classList.remove('active');
-        el.classList.add('active');
-        openDetail(c);
-      });
-      return el;
-    }
-
-    function run() {
-      var rgb = L.hexToRgb($hex.value);
-      if (isNaN(rgb.r)) return;
-      var res = L.nearestCOPIC(rgb, { n: NEAR_N, line: $line.value || undefined, colors: COLORS });
-      $out.innerHTML = '';
-      res.forEach(function (m) {
-        var c = COLORS.filter(function (x) { return x.code === m.code; })[0];
-        $out.appendChild(itemNode(m, c));
-      });
-    }
-
-    $pick.addEventListener('input', function () { $hex.value = $pick.value; run(); });
-    $hex.addEventListener('input', function () {
-      if (/^#[0-9a-fA-F]{6}$/.test($hex.value)) { $pick.value = $hex.value.toLowerCase(); run(); }
-    });
-    $line.addEventListener('change', run);
+    // 最接近色側欄（兩頁共用模組；點結果開本頁的明細 Modal）
+    CopicNearest.init({ onPick: openDetail });
     document.getElementById('setting-nearest').addEventListener('click', function () {
-      run();
-      panel.open();
+      CopicNearest.open();
     });
-
-    fillLines();
-    // 側欄常駐，切語言時它可能正開著：產品線選項與提示都要跟著重建（§4 控制器負責重繪）
-    document.addEventListener('i18n:changed', function () { fillLines(); run(); });
   }
 
   // ---- 起手 ---------------------------------------------------------------

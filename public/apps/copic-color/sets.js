@@ -267,7 +267,16 @@
       var next = I18n.cycle();
       M.toast({ html: I18n.t('toast.lang', { name: I18n.name(next) }), displayLength: 1400 });
     });
-    document.addEventListener('i18n:changed', function () { render(); CopicDetail.refresh(); });
+    // 最接近色側欄（與色票頁同一支模組）。在這頁特別有用：找到最接近的筆之後，
+    // 明細裡的套組是可點的 → 直接就地換成那個基準組，
+    // 「這個顏色該拿哪支筆 → 那支筆收在哪一盒」一條路走完，不必跳頁。
+    CopicNearest.init({ onPick: openDetail });
+    document.getElementById('setting-nearest').addEventListener('click', function () {
+      CopicNearest.open();
+    });
+    document.addEventListener('i18n:changed', function () {
+      render(); CopicDetail.refresh(); CopicNearest.refresh();
+    });
   }
 
   document.addEventListener('DOMContentLoaded', function () {
