@@ -30,6 +30,11 @@ I18n.register('en', {
   'nearest.allLines': 'All 358 colours (Sketch / Copic Ink)',
   'nearest.placeholder': '#RRGGBB',
 
+  'band.very': 'excellent match',
+  'band.close': 'close',
+  'band.noticeable': 'noticeable',
+  'band.far': 'far',
+
   'detail.close': 'Close',
   'detail.lines': 'Product lines',
   'detail.sets': 'Included in sets',

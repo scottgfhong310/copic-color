@@ -30,6 +30,11 @@ I18n.register('ja', {
   'nearest.allLines': '全 358 色（Sketch / Copic Ink）',
   'nearest.placeholder': '#RRGGBB',
 
+  'band.very': 'ごく近い',
+  'band.close': '近い',
+  'band.noticeable': '差が分かる',
+  'band.far': '遠い',
+
   'detail.close': '閉じる',
   'detail.lines': '製品ライン',
   'detail.sets': '収録セット',

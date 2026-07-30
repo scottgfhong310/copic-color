@@ -189,16 +189,23 @@ main { min-height: 100vh; }
 /* Materialize 給 .sidenav li 的固定行高會把整塊表單撐開，這裡解掉 */
 .nearest-panel li { line-height: normal; }
 
-.nearest-form { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 18px 0; }
+.nearest-form { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 18px 0; }
+/* ⚠️ 原生 color input 的色塊是 shadow DOM（Chrome 的 ::-webkit-color-swatch、
+ * Firefox 的 ::-moz-color-swatch），**外框的 border-radius 圓不到它**——不處理的話
+ * 就是「方形色塊裝在圓角外框裡」，圓角看起來髒。故 wrapper 內距歸零、色塊自己也給圓角
+ * （比外框小 1px＝邊框寬度），色塊才真的是圓角的。 */
 .nearest-form input[type="color"] {
-  width: 46px; height: 36px; padding: 0; border: 1px solid var(--border); border-radius: 8px;
-  background: none; cursor: pointer; flex: 0 0 auto;
+  width: 64px; height: 48px; padding: 0; border: 1px solid var(--border); border-radius: 11px;
+  background: none; cursor: pointer; flex: 0 0 auto; overflow: hidden;
 }
+.nearest-form input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.nearest-form input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 10px; }
+.nearest-form input[type="color"]::-moz-color-swatch { border: 0; border-radius: 10px; }
 .nearest-form input[type="text"] {
   flex: 1 1 auto; min-width: 0; width: auto;
-  background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
-  color: var(--text); padding: 7px 10px; height: 36px; margin: 0; box-sizing: border-box;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .84rem;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); padding: 7px 12px; height: 48px; margin: 0; box-sizing: border-box;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem;
 }
 .nearest-form select {
   flex: 1 0 100%; width: 100%;
@@ -228,10 +235,19 @@ main { min-height: 100vh; }
   display: block; font-size: .82rem; color: var(--text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.near-sub { display: flex; gap: 8px; align-items: baseline; font-size: .72rem; color: var(--muted); }
-.near-hex, .near-de { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-.band-very { color: #34c38f; } .band-close { color: #7fb3ff; }
-.band-noticeable { color: #e8b04b; } .band-far { color: #e07a6b; }
+.near-sub { display: flex; gap: 8px; align-items: center; font-size: .72rem; color: var(--muted); margin-top: 3px; }
+.near-hex { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+/* ΔE 分級標示：形制與色值同 caran-dache-color 的 .nr-de（pill ＋ 同一組 band 色）。
+ * 三支比對器用的是同一把尺（ΔE00）與同一組級距，級距的**讀法**也該長一樣。
+ * band-far 刻意不上色——「差異大」不是推薦，不該被裝飾成一個結論。 */
+.near-de {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  padding: 2px 8px; border-radius: 12px; border: 1px solid var(--border);
+  color: var(--muted); white-space: nowrap; flex: 0 0 auto;
+}
+.near-de.band-very { color: #37b26b; border-color: #37b26b; }
+.near-de.band-close { color: #26a69a; border-color: #26a69a; }
+.near-de.band-noticeable { color: #f0ad4e; border-color: #f0ad4e; }
 
 @media (max-width: 720px) {
   .search-wrap { margin-left: 0; width: 100%; }

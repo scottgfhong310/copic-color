@@ -30,6 +30,11 @@ I18n.register('zh-Hant', {
   'nearest.allLines': '全部 358 色（Sketch / Copic Ink）',
   'nearest.placeholder': '#RRGGBB',
 
+  'band.very': '極接近',
+  'band.close': '接近',
+  'band.noticeable': '可辨差異',
+  'band.far': '差異大',
+
   'detail.close': '關閉',
   'detail.lines': '產品線',
   'detail.sets': '收錄於套組',

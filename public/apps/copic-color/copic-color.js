@@ -312,6 +312,10 @@
 
   var NEAR_N = 12;
 
+  // ΔE 級距的中文說法（lib 的 deltaEBand 只回代號）。字典缺鍵時的 fallback；
+  // 文案與 caran-dache-color 的 band.* 逐字相同——同一把尺、同一組級距，讀法也該一樣。
+  var BAND_FB = { very: '極接近', close: '接近', noticeable: '可辨差異', far: '差異大' };
+
   function initNearest() {
     var $panel = document.getElementById('nearest-panel');
     var panel = M.Sidenav.init($panel, {
@@ -361,7 +365,8 @@
       sw.textContent = m.code;
       el.querySelector('.near-name').textContent = m.name || '';
       el.querySelector('.near-hex').textContent = m.hex;
-      el.querySelector('.near-de').textContent = 'ΔE ' + m.deltaE.toFixed(2);
+      el.querySelector('.near-de').textContent =
+        'ΔE ' + m.deltaE.toFixed(2) + ' · ' + t('band.' + m.band, BAND_FB[m.band]);
       el.addEventListener('click', function () {
         // 側欄不關：明細看完退回來還在同一份結果上
         var prev = $out.querySelector('.near-item.active');
