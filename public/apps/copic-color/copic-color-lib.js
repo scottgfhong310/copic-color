@@ -301,8 +301,13 @@
     });
     return out;
   }
-  function assortmentMatrix(sets, baseCode) {
-    var base = colorsInSet(sets, baseCode);
+  /**
+   * 套組矩陣：列＝色、`cells[套組 code]` ＝ 該組有沒有收錄。
+   * `opts.codes` 可指定列（未選基準組時要列出「所有被收錄過的色」，那不是任何單一組的色單）；
+   * 未給就用基準組的色單、照它自己的收錄順序。
+   */
+  function assortmentMatrix(sets, baseCode, opts) {
+    var base = (opts && opts.codes) ? opts.codes.slice() : colorsInSet(sets, baseCode);
     return base.map(function (code) {
       var row = { code: code, cells: {} };
       (sets || []).forEach(function (s) { row.cells[s.code] = s.colors.indexOf(code) >= 0; });

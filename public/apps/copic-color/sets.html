@@ -39,23 +39,24 @@
 <body data-i18n-doctitle="sets.title">
   <main>
     <div class="app-container wide">
-      <div class="topbar">
-        <div>
+      <!-- 固定 Header：捲動時產品線切換與目前基準組一直看得到（形制同 faber-castell-color） -->
+      <header class="page-head" id="page-head">
+        <div class="head-title">
           <h1 data-i18n="sets.title">COPIC 套組收錄對照</h1>
           <div class="sub" data-i18n="sets.sub">選一個套組 → 只留下它收錄的色 → 橫向看其他套組有沒有涵蓋</div>
         </div>
-        <div class="set-picker">
-          <label class="pick-label" data-i18n="sets.base">基準套組</label>
-          <select id="base-set" class="browser-default"></select>
-          <select id="line-filter" class="browser-default"></select>
-        </div>
-      </div>
+        <!-- 產品線切換（取代原本的兩個下拉選單）：點一條只留那一段，再點一次回到全部 -->
+        <div class="line-tabs" id="line-tabs"></div>
+        <div class="picked" id="picked"></div>
+      </header>
 
       <div class="legend" data-i18n="sets.incomplete">
         ＊ 該產品另含非色筆品項（Multiliner／Glitter Pen／指南），此處只記色筆
       </div>
 
-      <div id="matrix-wrap" class="matrix-wrap"></div>
+      <section class="matrix-sec" id="matrix"></section>
+
+      <p class="matrix-foot" id="matrix-foot"></p>
     </div>
   </main>
 

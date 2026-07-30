@@ -2,11 +2,17 @@
  * sets — 套組收錄對照（第二頁的控制器）
  *
  * 這一頁只回答一個問題：**選一個套組，其他套組涵蓋了它幾成？**
- * 形制沿用 faber-castell-color/sets.html（家族第一支雙頁 app 收斂出來的）：
- * 選一個基準組 → 只留下它收錄的色 → 橫向掃其他組 → 表頭寫「相對基準組還缺幾色」。
+ * 版面沿用 faber-castell-color/sets.html（家族第一支雙頁 app 收斂出來的）：
+ * 固定 Header（標題＋切換＋目前基準組）→ 一張表 → 頁尾說明；不包捲動外框，
+ * 表頭各列自己 sticky 在 Header 底下。
  *
- * COPIC 有 62 組（FC 是 40），全部並排會寬到不能用，故**預設只比同一條產品線**
- * ——拿 Sketch 的套組去比 Ciao 的套組，本來就不是會發生的購買決策。
+ * 表頭五列對應**官方型錄自己的分層**（來源：CopicAssortmentSort.xlsx Sheet2 的構想）：
+ *   產品線 → 子系列（subset）→ 序號（subsetIndex）→ 尺寸（size）→ 相對基準組還缺幾色
+ * 前四列是資料欄位（`subset`／`subsetIndex` 自 db_artcolor 匯出，**不在前端推導字串**），
+ * 第五列只有選了基準組才出現。
+ *
+ * 產品線切換取代了原本的兩個下拉選單：點一條線＝只留那一段（再點一次回到三線並排）；
+ * 基準組改成**點欄位的尺寸**選（同 FC），所以「基準套組」那個 select 不再需要。
  */
 (function () {
   'use strict';
@@ -15,153 +21,211 @@
   var COLORS = window.COPIC_COLORS || [];
   var SETS = window.COPIC_SETS || [];
   var META = window.COPIC_META || {};
+  var LS_LINE = 'copic-color-sets-line';
+  var LS_PICK = 'copic-color-sets-pick';
+
   var byCode = {};
   COLORS.forEach(function (c) { byCode[c.code] = c; });
 
-  var $base = document.getElementById('base-set');
-  var $line = document.getElementById('line-filter');
-  var $wrap = document.getElementById('matrix-wrap');
+  var $tabs = document.getElementById('line-tabs');
+  var $picked = document.getElementById('picked');
+  var $matrix = document.getElementById('matrix');
+  var $foot = document.getElementById('matrix-foot');
 
-  function t(key, fb) {
+  // 只列真正有套組的產品線（ink 是補充墨水、沒有套組，列出來會是一顆點不動的鍵）
+  var LINES = (META.lines || []).filter(function (l) {
+    return SETS.some(function (s) { return s.line === l.id; });
+  });
+
+  var line = null;      // null ＝ 三線並排；否則只留該產品線
+  var pick = null;      // 基準套組的 code，null ＝ 未選
+
+  function t(key, fb, params) {
     if (!window.I18n || !I18n.t) return fb;
-    var v = I18n.t(key);
+    var v = I18n.t(key, params);
     return (v && v !== key) ? v : fb;
   }
-
-  function setLabel(s) {
-    return s.name + '（' + s.colors.length + '）' + (s.complete ? '' : ' ＊');
-  }
-
-  // ---- 選單 ---------------------------------------------------------------
-
-  function fillPickers() {
-    var q = new URLSearchParams(location.search).get('set');
-    $base.innerHTML = '';
-    SETS.forEach(function (s) {
-      var o = document.createElement('option');
-      o.value = s.code;
-      o.textContent = setLabel(s);
-      $base.appendChild(o);
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
-    if (q && SETS.some(function (s) { return s.code === q; })) $base.value = q;
-
-    $line.innerHTML = '';
-    var same = document.createElement('option');
-    same.value = 'same';
-    same.textContent = t('sets.sameLine', '只比同產品線');
-    $line.appendChild(same);
-    var all = document.createElement('option');
-    all.value = 'all';
-    all.textContent = t('sets.allLines', '比全部 62 組');
-    $line.appendChild(all);
+  }
+  function lineName(id) {
+    var l = (META.lines || []).filter(function (x) { return x.id === id; })[0];
+    return l ? l.name : id;
+  }
+  function visibleSets() {
+    return line ? SETS.filter(function (s) { return s.line === line; }) : SETS.slice();
+  }
+  function setByCode(code) {
+    return SETS.filter(function (s) { return s.code === code; })[0] || null;
   }
 
-  // ---- 矩陣 ---------------------------------------------------------------
+  // ---- 固定 Header --------------------------------------------------------
+
+  function renderTabs() {
+    $tabs.innerHTML = LINES.map(function (l) {
+      var n = SETS.filter(function (s) { return s.line === l.id; }).length;
+      return '<button class="line-tab' + (l.id === line ? ' is-on' : '') + '" data-line="' + esc(l.id) + '">' +
+        esc(l.name) +
+        '<span class="line-n">' + t('sets.tabN', '{n} 組', { n: n }).replace('{n}', n) + '</span>' +
+        '</button>';
+    }).join('');
+  }
+
+  function renderPicked() {
+    var s = pick && setByCode(pick);
+    if (!s || (line && s.line !== line)) {
+      $picked.innerHTML = '<span class="picked-hint">' +
+        esc(t('sets.pickHint', '點欄位下方的尺寸，就只留下該套組的色')) + '</span>';
+      return;
+    }
+    $picked.innerHTML =
+      '<span class="picked-chip">' +
+        '<span class="picked-name">' + esc(s.name) + (s.complete ? '' : ' ＊') + '</span>' +
+        '<span class="picked-n">' + esc(t('sets.showingN', '{n} 色', { n: s.colors.length })
+          .replace('{n}', s.colors.length)) + '</span>' +
+        '<button class="picked-clear" id="picked-clear" title="' + esc(t('sets.clear', '清除選擇')) + '">' +
+          '<i class="material-icons">close</i></button>' +
+      '</span>';
+  }
+
+  // ---- 表頭：把「同一段連續欄」併成一格 ------------------------------------
+  // 兩層分組（產品線、子系列）都是這個動作，故抽成一支：keyOf 決定「什麼算同一段」。
+  function spans(cols, keyOf) {
+    var out = [], i = 0;
+    while (i < cols.length) {
+      var k = keyOf(cols[i]), n = 0;
+      while (i + n < cols.length && keyOf(cols[i + n]) === k) n++;
+      out.push({ key: k, span: n, first: i });
+      i += n;
+    }
+    return out;
+  }
+
+  function headHtml(cols, gaps) {
+    var rowspanLabel = function (key, fb) {
+      return '<th class="c-color r-label">' + esc(t(key, fb)) + '</th>';
+    };
+    // 第 1 列：產品線
+    var h1 = spans(cols, function (s) { return s.line; }).map(function (g) {
+      return '<th class="c-line" colspan="' + g.span + '">' +
+        '<span>' + esc(lineName(g.key)) + '</span></th>';
+    }).join('');
+    // 第 2 列：子系列（subset）——直排，因為名字比欄寬長得多
+    var h2 = spans(cols, function (s) { return s.line + '|' + (s.subset || s.name); }).map(function (g) {
+      var label = cols[g.first].subset || cols[g.first].name;
+      return '<th class="c-subset" colspan="' + g.span + '" title="' + esc(label) + '">' +
+        '<span class="vtext">' + esc(label) + '</span></th>';
+    }).join('');
+    // 第 3 列：子系列內的序號
+    var h3 = cols.map(function (s) {
+      return '<th class="c-sidx">' + esc(s.subsetIndex || '－') + '</th>';
+    }).join('');
+    // 第 4 列：尺寸（點它＝選為基準組）
+    var h4 = cols.map(function (s, ci) {
+      return '<th class="c-size' + (s.code === pick ? ' is-picked' : '') + '" data-col="' + ci + '"' +
+        ' title="' + esc(s.name + (s.complete ? '' : ' ＊')) + '">' + s.size + '</th>';
+    }).join('');
+    // 第 5 列：相對基準組還缺幾色（只有選了基準組才出現）
+    var h5 = '';
+    if (gaps) {
+      h5 = '<tr class="r-gap">' + rowspanLabel('sets.gapRow', '相對基準組還缺幾色') +
+        cols.map(function (s) {
+          var g = gaps[s.code];
+          var cls = s.code === pick ? ' is-picked' : (g === 0 ? ' is-full' : '');
+          return '<td class="c-gap' + cls + '" title="' + esc(s.code === pick
+            ? t('sets.gapSelf', '基準組本身')
+            : t('sets.gapTip', '相對基準組，這一欄還缺 {n} 色', { n: g }).replace('{n}', g)) + '">' +
+            (s.code === pick ? '—' : (g === 0 ? '0' : '−' + g)) + '</td>';
+        }).join('') + '</tr>';
+    }
+    return '<thead>' +
+      '<tr class="r-line">' + rowspanLabel('sets.rowLine', '產品線') + h1 + '</tr>' +
+      '<tr class="r-subset">' + rowspanLabel('sets.rowSubset', '子系列') + h2 + '</tr>' +
+      '<tr class="r-sidx">' + rowspanLabel('sets.rowIndex', '序號') + h3 + '</tr>' +
+      '<tr class="r-size">' + rowspanLabel('sets.colColour', '色') + h4 + '</tr>' +
+      h5 + '</thead>';
+  }
+
+  // ---- 內容 ---------------------------------------------------------------
+  // 列＝色。未選基準組時列出「可見套組收錄過的所有色」（依色號正序）；
+  // 選了基準組就把不在它裡面的列藏起來（同 FC：藏而不重建，捲動位置與 DOM 都穩定）。
+  function bodyHtml(cols, rows) {
+    return '<tbody>' + rows.map(function (r) {
+      var c = byCode[r.code];
+      var hidden = pick && !r.cells[pick];
+      var fg = c ? L.pickTextColor(c) : 'inherit';
+      var cells = cols.map(function (s) {
+        var on = r.cells[s.code];
+        return '<td class="cell' + (on ? ' is-in' : '') + (s.code === pick ? ' is-pickedcell' : '') + '">' +
+          (on ? '<span class="dot"></span>' : '') + '</td>';
+      }).join('');
+      return '<tr data-code="' + esc(r.code) + '"' + (hidden ? ' class="is-hidden"' : '') + '>' +
+        '<th class="c-color"><span class="ccell">' +
+          '<span class="mini" style="background:' + esc(c ? c.hex : 'transparent') + ';color:' + fg + '">' +
+            esc(r.code) + '</span>' +
+          '<span class="cname" title="' + esc(c && c.name ? c.name : '') + '">' +
+            esc(c && c.name ? c.name : '') + '</span>' +
+        '</span></th>' + cells + '</tr>';
+    }).join('') + '</tbody>';
+  }
+
+  // 列一律是「可見套組收錄過的所有色」，並用 lib 的正規色號序（與 index.html 同一把尺）。
+  // ⚠️ 不能拿 COPIC_COLORS 的陣列順序當色號序——那是 tb_color.fd_sort 的順序，實查首筆是 YG23。
+  // 選了基準組只是把不在它裡面的列**藏起來**（不重建、不重排），所以選/取消時版面不會跳。
+  function rowCodes(cols) {
+    var seen = {};
+    cols.forEach(function (s) { (s.colors || []).forEach(function (code) { seen[code] = 1; }); });
+    var list = COLORS.filter(function (c) { return seen[c.code]; });
+    return L.sortColors(list, 'code', window.COPIC_FAMILIES || []).map(function (c) { return c.code; });
+  }
 
   function render() {
-    var baseCode = $base.value;
-    var base = SETS.filter(function (s) { return s.code === baseCode; })[0];
-    if (!base) return;
+    var cols = visibleSets();
+    if (pick && !cols.some(function (s) { return s.code === pick; })) pick = null;  // 切線後基準組不在表上
 
-    var cols = $line.value === 'all'
-      ? SETS.slice()
-      : SETS.filter(function (s) { return s.line === base.line; });
+    var codes = rowCodes(cols);
+    var rows = L.assortmentMatrix(SETS, pick, { codes: codes });
+    var gaps = pick ? L.columnGaps(SETS, pick) : null;
 
-    // 差額一律以全集計算後再取用——只傳可見的欄會讓基準組本身可能不在集合裡
-    var gaps = L.columnGaps(SETS, baseCode);
+    $matrix.innerHTML = '<table class="assort' + (gaps ? ' has-gap' : '') + '">' +
+      headHtml(cols, gaps) + bodyHtml(cols, rows) + '</table>';
+    $matrix.dataset.line = line || 'all';
 
-    var rows = L.assortmentMatrix(SETS, baseCode);
+    renderTabs();
+    renderPicked();
+    $foot.textContent = t('sets.foot',
+      '點欄位的尺寸＝只留下該套組收錄的色（再點一次取消）；點左欄的色號開明細。上方切換產品線＝只留那一段。');
+    syncHeadHeight();
+  }
 
-    var tbl = document.createElement('table');
-    tbl.className = 'matrix';
+  // 固定 Header 的高度餵給表頭：thead 要黏在 Header 底下、不是視窗頂端。
+  // 高度隨語言／換行變動，所以量出來寫進 CSS 變數，不寫死（同 FC）。
+  function syncHeadHeight() {
+    var h = document.getElementById('page-head');
+    document.documentElement.style.setProperty('--head-h', (h ? h.offsetHeight : 0) + 'px');
+  }
 
-    // ── 表頭：套組名（直排） ──
-    var thead = document.createElement('thead');
-    var hr = document.createElement('tr');
-    ['c-swatch', 'c-code'].forEach(function (cls) {
-      var th = document.createElement('th');
-      th.className = cls;
-      hr.appendChild(th);
-    });
-    cols.forEach(function (s) {
-      var th = document.createElement('th');
-      var d = document.createElement('div');
-      d.className = 'set-col' + (s.code === baseCode ? ' is-base' : '');
-      d.textContent = setLabel(s);
-      d.title = (s.section ? s.section + ' — ' : '') + s.name + (s.note ? '\n' + s.note : '');
-      th.appendChild(d);
-      hr.appendChild(th);
-    });
-    thead.appendChild(hr);
-
-    // ── 差額列：相對基準組還缺幾色 ──
-    var gr = document.createElement('tr');
-    gr.className = 'gap-row';
-    var g0 = document.createElement('th');
-    g0.className = 'c-swatch';
-    gr.appendChild(g0);
-    var g1 = document.createElement('th');
-    g1.className = 'c-code gap-label';
-    g1.textContent = t('sets.gapRow', '相對基準組還缺幾色');
-    gr.appendChild(g1);
-    cols.forEach(function (s) {
-      var td = document.createElement('th');
-      var n = gaps[s.code];
-      td.className = 'gap-cell ' + (n === 0 ? 'gap-0' : 'gap-n');
-      td.textContent = n === 0 ? '0' : '−' + n;
-      gr.appendChild(td);
-    });
-    thead.appendChild(gr);
-    tbl.appendChild(thead);
-
-    // ── 內容：基準組的每一個色 ──
-    var tb = document.createElement('tbody');
-    rows.forEach(function (r) {
-      var c = byCode[r.code];
-      var tr = document.createElement('tr');
-
-      var tdS = document.createElement('td');
-      tdS.className = 'c-swatch';
-      var sw = document.createElement('div');
-      sw.className = 'm-sw';
-      sw.style.background = c ? c.hex : 'transparent';
-      sw.title = r.code + ' ' + (c && c.name ? c.name : '');
-      sw.addEventListener('click', function () { openDetail(c); });
-      tdS.appendChild(sw);
-      tr.appendChild(tdS);
-
-      var tdC = document.createElement('td');
-      tdC.className = 'c-code';
-      var code = document.createElement('span');
-      code.className = 'm-code';
-      code.textContent = r.code;
-      code.addEventListener('click', function () { openDetail(c); });
-      tdC.appendChild(code);
-      tr.appendChild(tdC);
-
-      cols.forEach(function (s) {
-        var td = document.createElement('td');
-        var on = r.cells[s.code];
-        td.className = on ? 'hit' : 'miss';
-        td.textContent = on ? '●' : '·';
-        tr.appendChild(td);
-      });
-      tb.appendChild(tr);
-    });
-    tbl.appendChild(tb);
-
-    $wrap.innerHTML = '';
-    $wrap.appendChild(tbl);
+  function setLine(id) {
+    line = (line === id) ? null : id;          // 再點一次＝回到三線並排
+    try { localStorage.setItem(LS_LINE, line || ''); } catch (e) { }
+    render();
+  }
+  function setPick(code) {
+    pick = code || null;
+    try { localStorage.setItem(LS_PICK, pick || ''); } catch (e) { }
+    render();
   }
 
   function openDetail(c) {
     if (!c) return;
     window.CopicDetail.open(c, {
       sets: SETS,
-      // 差異行為交給呼叫端：這一頁不跳走，就地換基準組（篩選與捲動位置都保住）
+      // 差異行為交給呼叫端：這一頁不跳走，就地換基準組（切換與捲動位置都保住）
       onSetClick: function (s) {
-        $base.value = s.code;
-        render();
+        if (line && s.line !== line) setLine(s.line);   // 跨產品線時先切過去
+        setPick(s.code);
         M.Modal.getInstance(document.getElementById('cp-detail-modal')).close();
       }
     });
@@ -182,15 +246,41 @@
       var next = I18n.cycle();
       M.toast({ html: I18n.t('toast.lang', { name: I18n.name(next) }), displayLength: 1400 });
     });
-    document.addEventListener('i18n:changed', function () { fillPickers(); render(); CopicDetail.refresh(); });
+    document.addEventListener('i18n:changed', function () { render(); CopicDetail.refresh(); });
   }
 
   document.addEventListener('DOMContentLoaded', function () {
     if (window.I18n) I18n.apply(document);
-    fillPickers();
+
+    // 深連結 ?set= / ?line= 優先，其次記憶；認不得就當沒選（不報錯）
+    var q = new URLSearchParams(location.search);
+    var wantSet = q.get('set');
+    var wantLine = q.get('line');
+    if (!wantSet) { try { wantSet = localStorage.getItem(LS_PICK); } catch (e) { } }
+    if (!wantLine) { try { wantLine = localStorage.getItem(LS_LINE); } catch (e) { } }
+    if (wantSet && setByCode(wantSet)) pick = wantSet;
+    if (wantLine && LINES.some(function (l) { return l.id === wantLine; })) line = wantLine;
+
     initTools();
-    $base.addEventListener('change', render);
-    $line.addEventListener('change', render);
     render();
+    window.addEventListener('resize', syncHeadHeight);
+
+    $tabs.addEventListener('click', function (e) {
+      var b = e.target.closest('.line-tab');
+      if (b) setLine(b.dataset.line);
+    });
+    $picked.addEventListener('click', function (e) {
+      if (e.target.closest('#picked-clear')) setPick('');
+    });
+    $matrix.addEventListener('click', function (e) {
+      var th = e.target.closest('.c-size');
+      if (th) {                                   // 點尺寸＝選為基準組（再點一次取消）
+        var s = visibleSets()[+th.dataset.col];
+        if (s) setPick(s.code === pick ? '' : s.code);
+        return;
+      }
+      var tr = e.target.closest('tbody tr');
+      if (tr && e.target.closest('.c-color')) openDetail(byCode[tr.dataset.code]);
+    });
   });
 })();
