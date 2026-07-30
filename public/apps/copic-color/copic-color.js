@@ -252,6 +252,16 @@
       render();
     });
 
+    // 「套組收錄對照」另開分頁。**用 window.open 而不是讓 anchor 自己開**——
+    // anchor 的 target="_blank" 自 Chrome 88 起隱含 noopener，子頁拿不到 opener、
+    // 也就關不掉自己；sets.html 的「回色票頁」要能回到**開啟它的這一個**分頁。
+    // 保留 href 讓中鍵／新視窗／無 JS 時仍可用，被擋掉（回 null）就同分頁開。
+    document.getElementById('setting-sets').addEventListener('click', function (e) {
+      e.preventDefault();
+      var url = this.getAttribute('href');
+      if (!window.open(url, '_blank')) window.location.href = url;
+    });
+
     document.getElementById('setting-mode').addEventListener('click', function () {
       applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
     });

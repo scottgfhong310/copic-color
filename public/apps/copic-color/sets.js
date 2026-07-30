@@ -237,7 +237,24 @@
 
   // ---- 側鍵 ---------------------------------------------------------------
 
+  // 「回色票頁」＝回到**開啟本頁的那一個**色票頁，不是另外開一個新的。
+  // 這頁幾乎都是從色票頁另開分頁來的，所以優先關掉本分頁——原分頁的搜尋、
+  // 色系選擇、捲動位置都還在，導航過去只會得到一個乾淨的新狀態。
+  // 三層退路：① 有 opener（script 開的分頁）→ 關掉自己；② 同分頁跳過來的
+  // → history.back()；③ 直接開深連結進來的 → 照 href 導航。
+  function backToGrid(e) {
+    if (window.opener && !window.opener.closed) { e.preventDefault(); window.close(); return; }
+    var fromGrid = false;
+    try {
+      var u = new URL(document.referrer);
+      fromGrid = u.origin === location.origin && /\/(index\.html)?$/.test(u.pathname);
+    } catch (err) { }
+    if (fromGrid && history.length > 1) { e.preventDefault(); history.back(); return; }
+    // 其餘不攔：讓 <a href> 自己導航（無 JS 時也是這個行為）
+  }
+
   function initTools() {
+    document.getElementById('setting-back').addEventListener('click', backToGrid);
     document.getElementById('setting-mode').addEventListener('click', function () {
       var mode = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
       var r = document.documentElement;
