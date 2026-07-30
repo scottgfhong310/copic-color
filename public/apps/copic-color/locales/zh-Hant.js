@@ -15,7 +15,7 @@ I18n.register('zh-Hant', {
   'tool.css': '檢視 / 複製整份 CSS',
   'tool.download': '下載 copic_colors.css',
   'tool.mode': '切換 light / dark',
-  'tool.lang': 'Language',
+  'tool.lang': '語言',
 
   'axis.explain': '縱軸 Blending Group（飽和層級 0–9）、橫軸 Intensity（明度層級 000–9）',
   'axis.noGrid': '此色系不在 Blending Group / Intensity 的編號體系內，改以色票列呈現',
@@ -58,6 +58,6 @@ I18n.register('zh-Hant', {
 
   'toast.copied': '已複製',
   'toast.copyFail': '複製失敗（需 localhost 或 HTTPS）',
-  'toast.lang': '語言：{name}',
-  'toast.downloaded': '已下載 {n}'
+  'toast.lang': '已切換為 {name}',
+  'toast.downloaded': '已下載：{n}'
 }, '繁體中文');

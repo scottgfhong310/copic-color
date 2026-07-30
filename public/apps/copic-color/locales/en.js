@@ -58,6 +58,6 @@ I18n.register('en', {
 
   'toast.copied': 'Copied',
   'toast.copyFail': 'Copy failed (needs localhost or HTTPS)',
-  'toast.lang': 'Language: {name}',
-  'toast.downloaded': 'Downloaded {n}'
+  'toast.lang': 'Switched to {name}',
+  'toast.downloaded': 'Downloaded: {n}'
 }, 'English');

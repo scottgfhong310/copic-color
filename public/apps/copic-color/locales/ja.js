@@ -15,7 +15,7 @@ I18n.register('ja', {
   'tool.css': 'CSS 全体を表示 / コピー',
   'tool.download': 'copic_colors.css をダウンロード',
   'tool.mode': 'ライト / ダーク切替',
-  'tool.lang': 'Language',
+  'tool.lang': '言語',
 
   'axis.explain': '縦軸＝ブレンディンググループ（彩度 0–9）、横軸＝インテンシティ（明度 000–9）',
   'axis.noGrid': 'このカラーファミリーは番号体系の外のため、一覧表示に切り替えます',
@@ -58,6 +58,6 @@ I18n.register('ja', {
 
   'toast.copied': 'コピーしました',
   'toast.copyFail': 'コピーに失敗しました（localhost または HTTPS が必要）',
-  'toast.lang': '言語：{name}',
-  'toast.downloaded': '{n} をダウンロードしました'
+  'toast.lang': '{name} に切り替えました',
+  'toast.downloaded': 'ダウンロード：{n}'
 }, '日本語');
