@@ -41,6 +41,7 @@ I18n.register('en', {
   'detail.sets': 'Included in sets',
   'detail.parse': 'Code breakdown',
   'detail.family': 'Colour family',
+  'detail.familyJump': 'Show only this colour family',
   'detail.bg': 'Blending Group',
   'detail.iv': 'Intensity',
   'detail.noSet': 'Not in any recorded set',

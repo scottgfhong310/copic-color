@@ -41,6 +41,7 @@ I18n.register('zh-Hant', {
   'detail.sets': '收錄於套組',
   'detail.parse': '色號分解',
   'detail.family': '色系',
+  'detail.familyJump': '只看這個色系',
   'detail.bg': 'Blending Group',
   'detail.iv': 'Intensity',
   'detail.noSet': '不在任何已收錄的套組裡',

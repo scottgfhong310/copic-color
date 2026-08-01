@@ -59,6 +59,23 @@
     return sep;
   }
 
+  /**
+   * 切到某個色系並重畫。chip 與明細的「色系」那格共用這一支——
+   * 兩處各寫一次遲早會漂（例如只有一邊記得寫 localStorage）。
+   */
+  function pickFamily(code) {
+    if (!FAMS.some(function (f) { return f.code === code; })) return false;
+    state.family = code;
+    state.layout = 'axis';
+    state.q = '';
+    var $s = document.getElementById('search');
+    if ($s) $s.value = '';
+    localStorage.setItem(KEY_FAM, state.family);
+    localStorage.setItem(KEY_LAYOUT, state.layout);
+    render();
+    return true;
+  }
+
   function renderFamilies() {
     $fams.innerHTML = '';
 
@@ -84,13 +101,7 @@
       $fams.appendChild(chipNode(
         f.code, f.name, n,
         state.layout !== 'flat' && f.code === state.family,
-        function () {
-          state.family = f.code;
-          state.layout = 'axis';
-          localStorage.setItem(KEY_FAM, f.code);
-          localStorage.setItem(KEY_LAYOUT, state.layout);
-          render();
-        }
+        function () { pickFamily(f.code); }
       ));
     });
   }
@@ -231,7 +242,9 @@
   function openDetail(c) {
     window.CopicDetail.open(c, {
       sets: SETS,
-      onSetClick: function (s) { window.open('./sets.html?set=' + encodeURIComponent(s.code), '_blank'); }
+      onSetClick: function (s) { window.open('./sets.html?set=' + encodeURIComponent(s.code), '_blank'); },
+      // 點明細裡的色系 → 本頁就地切到那個色系的三軸矩陣（不跳頁、不開新分頁）
+      onFamilyClick: function (fam) { pickFamily(fam); }
     });
   }
 
@@ -318,6 +331,9 @@
       render();
     });
     initTools();
+    // 深連結 ?family=BV：從 sets.html 的明細點色系過來時，直接停在那個色系
+    var m = /[?&]family=([^&]+)/.exec(window.location.search);
+    if (m) pickFamily(decodeURIComponent(m[1]));
     render();
   });
 })();

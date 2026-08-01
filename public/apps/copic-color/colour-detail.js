@@ -10,7 +10,7 @@
  * FC 是耐光度＋套組、CDA 是事實表＋跨系列色帶、本支是色號分解＋產品線＋套組。
  * 差異行為（點了套組要做什麼）用 callback 交給呼叫端，模組不判斷「我在哪一頁」。
  *
- * 用法：CopicDetail.open(color, { sets, onSetClick })
+ * 用法：CopicDetail.open(color, { sets, onSetClick, onFamilyClick })
  */
 (function (global) {
   'use strict';
@@ -85,6 +85,15 @@
     el.innerHTML = MARKUP;
     document.body.appendChild(el);
     inst = M.Modal.init(el, { preventScrolling: false });
+    // 委派綁在模組注入的容器上，**只綁一次**——呼叫端不要再對同一個選擇器綁第二個
+    // handler（faber-castell-color 就因為兩處各綁一次，點一下同時開新分頁又把本頁導走）。
+    el.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('.fact-link[data-family]');
+      if (!b) return;
+      var fam = b.getAttribute('data-family');
+      inst.close();
+      if (currentOpts && currentOpts.onFamilyClick) currentOpts.onFamilyClick(fam);
+    });
     if (global.I18n && global.I18n.apply) global.I18n.apply(el);
   }
 
@@ -124,6 +133,19 @@
     return '<tr><td class="fk">' + esc(k) + '</td><td class="fv">' + esc(v) + '</td></tr>';
   }
 
+  /**
+   * 值本身可點的事實列。用途：從明細直接跳到「同一個色系的其他色」。
+   * 差異行為交給呼叫端的 callback（§4.1 的第三種模組）——在 index 是就地換色系、
+   * 在 sets.html 是開 index 並帶上該色系；模組不判斷「我在哪一頁」。
+   * **沒有 callback 就退回純文字**，不留一顆按了不動的死鍵（§5.13）。
+   */
+  function factRowLink(k, v, data, hint) {
+    if (!currentOpts || !currentOpts.onFamilyClick) return factRow(k, v);
+    return '<tr><td class="fk">' + esc(k) + '</td><td class="fv">'
+      + '<button type="button" class="fact-link" data-family="' + esc(data) + '"'
+      + ' title="' + esc(hint) + '">' + esc(v) + '</button></td></tr>';
+  }
+
   function open(color, opts) {
     opts = opts || {};
     ensure();
@@ -156,7 +178,9 @@
     var parse = document.getElementById('d-parse');
     if (color.bg !== undefined && color.bg !== null) {
       parse.innerHTML = '<table class="facts-table"><tbody>' +
-        factRow(t('detail.family', '色系'), (fam ? fam.code + ' · ' + fam.name : color.family)) +
+        factRowLink(t('detail.family', '色系'),
+          (fam ? fam.code + ' · ' + fam.name : color.family), color.family,
+          t('detail.familyJump', '只看這個色系')) +
         factRow(t('detail.bg', 'Blending Group'), color.bg) +
         factRow(t('detail.iv', 'Intensity'), color.iv) +
         '</tbody></table>';

@@ -231,6 +231,11 @@
         if (line && s.line !== line) setLine(s.line);   // 跨產品線時先切過去
         setPick(s.code);
         M.Modal.getInstance(document.getElementById('cp-detail-modal')).close();
+      },
+      // 本頁沒有三軸矩陣可切，故點色系＝回色票頁並停在那個色系。
+      // 用 window.open 開新分頁會讓「回色票頁」的分頁關係變複雜，這裡就地導過去。
+      onFamilyClick: function (fam) {
+        window.location.href = './index.html?family=' + encodeURIComponent(fam);
       }
     });
   }

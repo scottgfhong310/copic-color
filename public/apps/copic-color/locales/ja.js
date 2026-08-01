@@ -41,6 +41,7 @@ I18n.register('ja', {
   'detail.sets': '収録セット',
   'detail.parse': 'カラーナンバーの構成',
   'detail.family': 'カラーファミリー',
+  'detail.familyJump': 'この色系だけを表示',
   'detail.bg': 'ブレンディンググループ',
   'detail.iv': 'インテンシティ',
   'detail.noSet': '収録セットなし',
