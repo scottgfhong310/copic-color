@@ -20,7 +20,7 @@
  *   axisGrid(colors, familyCode) → { bgs, ivs, cell(bg,iv), flat } 三軸矩陣（本 app 的招牌）
  *   parseCode(code) → { family, bg, iv } | null      純由色號推導，供驗證
  *   hexToRgb · rgbToHsl · rgbToLab · deltaE(ΔE00) · deltaEBand
- *   nearestCOPIC({r,g,b}, { n, line, colors }) → [{ code,name,hex,cssVar,deltaE,band }]
+ *   nearestCOPIC({r,g,b}, { n, line, blender, colors }) → [{ code,name,hex,cssVar,deltaE,band }]
  *   relLuminance · contrastRatio · pickTextColor
  *   setIndex(sets) · colorsInSet · setsOfColor · assortmentMatrix · columnGaps
  *   formatRgb · copyValue · buildCss · cssFilename
@@ -240,6 +240,9 @@
     return dE <= 2 ? 'very' : dE <= 5 ? 'close' : dE <= 10 ? 'noticeable' : 'far';
   }
 
+  // 0 號是無色調和筆（Colorless Blender），沒有顏料——比對器預設把它排除，見 nearestCOPIC。
+  var BLENDER_CODE = '0';
+
   // ---- 最接近 COPIC 色比對 ------------------------------------------------
 
   var _labCache = null, _labSrc = null;
@@ -253,10 +256,16 @@
    * 找出最接近給定 RGB 的 COPIC 色。
    * opts.line 可限定產品線（'ciao' 只比 Ciao 有出的 180 色）——**手上沒有的筆別推薦**。
    * 預設比全部 358（Sketch 與 Copic Ink 的完整色域）。
+   *
+   * **預設排除 0 號無色調和筆**（`#ffffff`，沒有顏料，用途是暈染／推色）。
+   * 不排除的話白色與近白色的第一名永遠是它——ΔE 完美，但「用調和筆畫白」是錯的答案。
+   * 與 `opts.line` 是同一條原則的兩種樣子：**比對器不該推薦一支畫不出那個顏色的筆。**
+   * 真要把它算進來（例如做完整色域統計）傳 `blender:true`。
    */
   function nearestCOPIC(rgb, opts) {
     opts = opts || {};
     var pool = opts.colors || global.COPIC_COLORS || [];
+    if (!opts.blender) pool = pool.filter(function (c) { return c.code !== BLENDER_CODE; });
     if (opts.line) {
       pool = pool.filter(function (c) { return (c.lines || []).indexOf(opts.line) >= 0; });
     }
@@ -365,6 +374,7 @@
     rgbToLab: rgbToLab,
     deltaE: deltaE,
     deltaEBand: deltaEBand,
+    BLENDER_CODE: BLENDER_CODE,
     nearestCOPIC: nearestCOPIC,
     relLuminance: relLuminance,
     contrastRatio: contrastRatio,

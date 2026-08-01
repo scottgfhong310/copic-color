@@ -34,3 +34,41 @@ echo "=== 共用件 hash（應與家族其餘複製點一致）==="
 for f in materialize-dark.css side-tool.css side-tool.js filter-clear.css filter-clear.js i18n.js; do
   printf "  %-22s %s\n" "$f" "$(md5 -q "$SRC/$f")"
 done
+
+echo
+echo "=== 2) lib + 資料 → color-palette / thangka-trace（含各自的 InProgress 鏡像）==="
+# 兩支消費端呼叫 nearestCOPIC 做「最接近的筆」。它們**不連任何 DB**，
+# 靠的就是這裡複製過去的 lib 與資料——所以每次改本 repo 的 lib／資料都要再跑一次。
+# 資料本身是 db_artcolor 的匯出產物，本段只負責散佈、不產生。
+for app in color-palette thangka-trace; do
+  for dst in "$G/$app/public/apps/$app" "$I/public/apps/$app"; do
+    [ -d "$dst" ] || { echo "  MISSING $dst"; continue; }
+    cp "$SRC/copic-color-lib.js" "$dst/copic-color-lib.js"
+    cp "$SRC/data/copic-colors.js" "$dst/data/copic-colors.js"
+  done
+done
+
+verify() {   # $1=檔名相對路徑, 其餘=所有複製點
+  local label=$1; shift
+  local n
+  n=$(md5 -r "$@" | awk '{print $1}' | sort -u | wc -l | tr -d ' ')
+  if [ "$n" = "1" ]; then echo "  OK  $label — $# 份單一 hash"; else echo "  MISMATCH  $label — $n 種 hash"; fi
+}
+
+echo
+echo "=== md5 驗證（消費端複製件）==="
+verify "copic-color-lib.js" \
+  "$SRC/copic-color-lib.js" \
+  "$G/color-palette/public/apps/color-palette/copic-color-lib.js" \
+  "$G/thangka-trace/public/apps/thangka-trace/copic-color-lib.js" \
+  "$I/public/apps/copic-color/copic-color-lib.js" \
+  "$I/public/apps/color-palette/copic-color-lib.js" \
+  "$I/public/apps/thangka-trace/copic-color-lib.js"
+
+verify "data/copic-colors.js" \
+  "$SRC/data/copic-colors.js" \
+  "$G/color-palette/public/apps/color-palette/data/copic-colors.js" \
+  "$G/thangka-trace/public/apps/thangka-trace/data/copic-colors.js" \
+  "$I/public/apps/copic-color/data/copic-colors.js" \
+  "$I/public/apps/color-palette/data/copic-colors.js" \
+  "$I/public/apps/thangka-trace/data/copic-colors.js"
