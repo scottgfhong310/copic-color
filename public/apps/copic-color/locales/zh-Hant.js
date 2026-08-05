@@ -16,6 +16,7 @@ I18n.register('zh-Hant', {
   'tool.download': '下載 copic_colors.css',
   'tool.mode': '切換 light / dark',
   'tool.lang': '語言',
+  'tool.more': '更多工具',
 
   'axis.explain': '縱軸 Blending Group（飽和層級 0–9）、橫軸 Intensity（明度層級 000–9）',
   'axis.noGrid': '此色系不在 Blending Group / Intensity 的編號體系內，改以色票列呈現',

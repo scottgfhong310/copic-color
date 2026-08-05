@@ -16,6 +16,7 @@ I18n.register('en', {
   'tool.download': 'Download copic_colors.css',
   'tool.mode': 'Toggle light / dark',
   'tool.lang': 'Language',
+  'tool.more': 'More tools',
 
   'axis.explain': 'Rows = Blending Group (saturation, 0–9); columns = Intensity Value (000–9)',
   'axis.noGrid': 'This family sits outside the Blending Group / Intensity numbering, so it is shown as a plain list',

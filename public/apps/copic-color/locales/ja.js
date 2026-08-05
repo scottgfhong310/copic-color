@@ -16,6 +16,7 @@ I18n.register('ja', {
   'tool.download': 'copic_colors.css をダウンロード',
   'tool.mode': 'ライト / ダーク切替',
   'tool.lang': '言語',
+  'tool.more': 'その他のツール',
 
   'axis.explain': '縦軸＝ブレンディンググループ（彩度 0–9）、横軸＝インテンシティ（明度 000–9）',
   'axis.noGrid': 'このカラーファミリーは番号体系の外のため、一覧表示に切り替えます',
