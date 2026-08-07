@@ -104,6 +104,13 @@ CSS 匯出/下載、i18n 三語、主題切換（**色票保留真實顏色、�
 | `i18n.js` | 家族 repo `nodeapp-webapp-family/i18n.js`（權威版，byte-identical） |
 | `data/copic-*.js` | **由 `db_artcolor` 匯出**（`My Projects/Art Colour/export/a3-export.js`）。<br>`--check` 逐位元組比對、不一致回非 0。**不要手改這兩個檔** |
 
+**本 app 是別人的上游**：`color-palette`／`thangka-trace`／`color-mixer` 借走
+`copic-color-lib.js` ＋ `data/copic-colors.js` 做 `nearestCOPIC`
+（`color-mixer` 於 2026-08-07 接上，是第三個消費端）。**改了 lib 或資料就要跑**
+`bash scripts/sync-copies.sh`——它同步 InProgress 鏡像與三支消費端（含各自的鏡像），
+並以 md5 驗**八份**複製件是不是單一 hash。
+**權威版改了、複製點沒跟上，沒有任何東西會報錯。**
+
 ## 回灌 InProgress（Path A 的 A4）
 
 ```bash

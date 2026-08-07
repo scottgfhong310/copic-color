@@ -3,7 +3,7 @@
 #
 # 權威版＝ GitHub/copic-color。複製點兩類：
 #   ① InProgress 鏡像（整包前端）
-#   ② color-palette / thangka-trace 的 lib + 資料（它們呼叫 nearestCOPIC），各自也有 InProgress 鏡像
+#   ② color-palette / thangka-trace / color-mixer 的 lib + 資料（它們呼叫 nearestCOPIC），各自也有 InProgress 鏡像
 #
 # **回灌不是一次性的**（WORKFLOW.md Path A 的 A4）：GitHub 版是權威，
 # 之後每次改前端都要再跑一次，否則 3001 上跑的是舊版。
@@ -37,11 +37,11 @@ for f in materialize-dark.css side-tool.css side-tool.js filter-clear.css filter
 done
 
 echo
-echo "=== 2) lib + 資料 → color-palette / thangka-trace（含各自的 InProgress 鏡像）==="
-# 兩支消費端呼叫 nearestCOPIC 做「最接近的筆」。它們**不連任何 DB**，
+echo "=== 2) lib + 資料 → color-palette / thangka-trace / color-mixer（含各自的 InProgress 鏡像）==="
+# 三支消費端呼叫 nearestCOPIC 做「最接近的筆」。它們**不連任何 DB**，
 # 靠的就是這裡複製過去的 lib 與資料——所以每次改本 repo 的 lib／資料都要再跑一次。
 # 資料本身是 db_artcolor 的匯出產物，本段只負責散佈、不產生。
-for app in color-palette thangka-trace; do
+for app in color-palette thangka-trace color-mixer; do
   for dst in "$G/$app/public/apps/$app" "$I/public/apps/$app"; do
     [ -d "$dst" ] || { echo "  MISSING $dst"; FAIL=1; continue; }
     cp "$SRC/copic-color-lib.js" "$dst/copic-color-lib.js"
@@ -65,7 +65,9 @@ verify "copic-color-lib.js" \
   "$G/thangka-trace/public/apps/thangka-trace/copic-color-lib.js" \
   "$I/public/apps/copic-color/copic-color-lib.js" \
   "$I/public/apps/color-palette/copic-color-lib.js" \
-  "$I/public/apps/thangka-trace/copic-color-lib.js"
+  "$I/public/apps/thangka-trace/copic-color-lib.js" \
+  "$G/color-mixer/public/apps/color-mixer/copic-color-lib.js" \
+  "$I/public/apps/color-mixer/copic-color-lib.js"
 
 verify "data/copic-colors.js" \
   "$SRC/data/copic-colors.js" \
@@ -73,7 +75,9 @@ verify "data/copic-colors.js" \
   "$G/thangka-trace/public/apps/thangka-trace/data/copic-colors.js" \
   "$I/public/apps/copic-color/data/copic-colors.js" \
   "$I/public/apps/color-palette/data/copic-colors.js" \
-  "$I/public/apps/thangka-trace/data/copic-colors.js"
+  "$I/public/apps/thangka-trace/data/copic-colors.js" \
+  "$G/color-mixer/public/apps/color-mixer/data/copic-colors.js" \
+  "$I/public/apps/color-mixer/data/copic-colors.js"
 
 echo
 if [ "$FAIL" -eq 0 ]; then echo "全部通過。"; else echo "有項目不一致（見上）。"; fi
